@@ -1,0 +1,81 @@
+---
+/**
+ * The home page reads like a book: the cover opens, the phone comes apart to
+ * show how Kuchie works, the reader demonstrates itself, extensions get
+ * stamped, the rest is one manga page, and the back cover closes it.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BookHero from '../scenes/BookHero';
+import HowItWorks from '../scenes/HowItWorks';
+import ReadingStory from '../scenes/ReadingStory';
+import StampCheck from '../scenes/StampCheck';
+import MangaPage from '../home/MangaPage.astro';
+import Shelf from '../home/Shelf.astro';
+import Closing from '../home/Closing.astro';
+import { getLocale, localizedPath } from '../../i18n/locales';
+import { homeCopy } from '../../i18n/home';
+import { altstoreUrl, latest } from '../../data/site';
+import { kiriSources } from '../../data/kiri';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const locale = getLocale(slug);
+const rtl = locale.dir === 'rtl';
+const c = homeCopy(slug);
+const sizeMb = String(Math.round(latest.ipa.size / 1_000_000));
+const fill = (s: string) => s.replace('{version}', `v${latest.version}`).replace('{size}', sizeMb);
+const meta = c.hero.meta.map(fill);
+const k = await kiriSources();
+const site = Astro.site ?? new URL('https://kuchie.app');
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Kuchie',
+    description: c.hero.lede,
+    applicationCategory: 'EntertainmentApplication',
+    operatingSystem: 'iOS 15 or later',
+    softwareVersion: latest.version,
+    datePublished: latest.date,
+    downloadUrl: new URL(localizedPath(slug, 'download'), site).href,
+    image: new URL('/icon-512.png', site).href,
+    screenshot: new URL(slug === 'id' ? '/og/id.png' : '/og/default.png', site).href,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    isAccessibleForFree: true,
+    inLanguage: locale.lang,
+    sameAs: ['https://github.com/kuchie-app/Kuchie'],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Kuchie',
+    url: new URL(localizedPath(slug), site).href,
+    inLanguage: locale.lang,
+  },
+];
+---
+
+<BaseLayout slug={slug} path="" title={c.hero.lines.join(' ')} description={c.hero.lede}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
+  <BookHero
+    client:load
+    k={k}
+    lines={c.hero.lines}
+    lede={c.hero.lede}
+    download={{ href: localizedPath(slug, 'download'), label: fill(c.hero.download) }}
+    altstore={{ href: altstoreUrl, label: c.hero.altstore }}
+    meta={meta}
+    hint={c.hero.hint}
+    cover={c.hero.cover}
+    rtl={rtl}
+  />
+  <HowItWorks client:visible k={k} c={c.how} />
+  <ReadingStory client:visible k={k} c={c.reading} rtl={rtl} />
+  <StampCheck client:visible c={c.safety} guideHref={localizedPath(slug, 'guides/getting-started')} rtl={rtl} />
+  <Shelf caption={c.page.shelf} />
+  <MangaPage c={c.page} />
+  <Closing c={c} slug={slug} download={fill(c.hero.download)} altstore={c.hero.altstore} meta={meta} />
+</BaseLayout>

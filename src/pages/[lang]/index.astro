@@ -1,0 +1,12 @@
+---
+import HomePage from '../../components/pages/HomePage.astro';
+import { prefixedLocales } from '../../i18n/locales';
+
+export function getStaticPaths() {
+  return prefixedLocales.map((l) => ({ params: { lang: l.slug } }));
+}
+
+const { lang } = Astro.params;
+---
+
+<HomePage slug={lang} />

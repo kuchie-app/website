@@ -1,0 +1,625 @@
+---
+/**
+ * Everything else, laid out as one manga page: panels of different sizes
+ * with gutters, two of them cut at an angle. Each panel is inked in (a clip
+ * wipe) as it scrolls into view.
+ */
+import LanguageBubble from '../scenes/LanguageBubble';
+import type { HomeCopy } from '../../i18n/home';
+import { LANGUAGE_SAMPLES } from '../../i18n/home';
+import { Cover, SERIES } from '../art/Covers';
+
+interface Props {
+  c: HomeCopy['page'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="mp" aria-labelledby="mp-title">
+  <div class="wrap">
+    <header class="mp__head" data-reveal>
+      <p class="folio mono"><b>05</b><span>{c.folio}</span></p>
+      <h2 id="mp-title" class="h2" data-reveal="title">{c.title}</h2>
+    </header>
+
+    <div class="mp__page">
+      <article class="panel panel--library" data-reveal="wipe">
+        <div class="panel__text">
+          <h3>{c.panels.library.title}</h3>
+          <p>{c.panels.library.body}</p>
+        </div>
+        <div class="covers" aria-hidden="true">
+          {SERIES.map((sr) => <Cover id={sr.id} title={sr.title} vol={sr.vol} badge={sr.unread || undefined} />)}
+        </div>
+      </article>
+
+      <article class="panel panel--lang" data-reveal="wipe" data-reveal-delay="80">
+        <LanguageBubble client:visible words={LANGUAGE_SAMPLES} />
+        <div class="panel__text">
+          <h3>{c.panels.languages.title}</h3>
+          <p>{c.panels.languages.body}</p>
+        </div>
+      </article>
+
+      <article class="panel panel--updates" data-reveal="wipe" data-reveal-delay="0">
+        <div class="rows" aria-hidden="true">
+          <div><span class="dot"></span><span>The Lost Bookmark</span><span class="mono">Ch. 4</span></div>
+          <div><span class="dot"></span><span>Night Shift Library</span><span class="mono">Ch. 31</span></div>
+          <div><span class="dot dot--read"></span><span>Paper Cranes</span><span class="mono">Ch. 8</span></div>
+        </div>
+        <div class="panel__text">
+          <h3>{c.panels.updates.title}</h3>
+          <p>{c.panels.updates.body}</p>
+        </div>
+      </article>
+
+      <article class="panel panel--themes" data-reveal="wipe" data-reveal-delay="80">
+        <div class="themes" aria-hidden="true">
+          <div class="theme theme--light"><span></span><i></i><i></i><i></i></div>
+          <div class="theme theme--dark"><span></span><i></i><i></i><i></i></div>
+          <div class="theme theme--black"><span></span><i></i><i></i><i></i></div>
+        </div>
+        <div class="panel__text">
+          <h3>{c.panels.themes.title}</h3>
+          <p>{c.panels.themes.body}</p>
+        </div>
+      </article>
+
+      <article class="panel panel--offline" data-reveal="wipe" data-reveal-delay="160">
+        <div class="ring" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="20" pathLength="1"></circle>
+            <circle class="ring__fill" cx="24" cy="24" r="20" pathLength="1"></circle>
+          </svg>
+          <svg class="ring__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v10m0 0 4-4m-4 4-4-4M6 19h12"></path>
+          </svg>
+        </div>
+        <div class="panel__text">
+          <h3>{c.panels.offline.title}</h3>
+          <p>{c.panels.offline.body}</p>
+        </div>
+      </article>
+
+      <article class="panel panel--server" data-reveal="wipe" data-reveal-delay="0">
+        <div class="panel__text">
+          <h3>{c.panels.server.title}</h3>
+          <p>{c.panels.server.body}</p>
+        </div>
+        <div class="chips mono" aria-hidden="true">
+          <svg class="chips__sync" viewBox="0 0 400 10" preserveAspectRatio="none"><path d="M0 5 H400" pathLength="1"></path></svg>
+          <span>AniList</span><span>MyAnimeList</span><span>Kitsu</span><span>backup-2026-11-18.tachibk</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mp {
+    padding-block: clamp(96px, 12vw, 160px) 0;
+  }
+
+  .mp__head {
+    margin-bottom: 40px;
+  }
+
+  .mp__page {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(150px, auto);
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+  }
+
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 4px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .panel h3 {
+    font-size: 17px;
+    line-height: 24px;
+  }
+
+  .panel p {
+    margin-top: 4px;
+    max-width: 30rem;
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .panel--library {
+    grid-column: span 7;
+    grid-row: span 2;
+    clip-path: polygon(0 0, 100% 0, 100% 88%, 92% 100%, 0 100%);
+  }
+
+  .panel--lang {
+    grid-column: span 5;
+    grid-row: span 2;
+    align-items: start;
+  }
+
+  .panel--updates {
+    grid-column: span 4;
+  }
+
+  .panel--themes {
+    grid-column: span 4;
+  }
+
+  .panel--offline {
+    grid-column: span 4;
+    clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%, 0 14%);
+  }
+
+  .panel--server {
+    grid-column: span 12;
+    flex-direction: row;
+    align-items: end;
+  }
+
+  /* Library covers */
+  .covers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 360px;
+    perspective: 800px;
+  }
+
+  .covers :global(.kcover) {
+    transition: transform var(--mid) var(--ease);
+  }
+
+  .covers :global(.kcover:hover) {
+    transform: translateY(-4px) rotateY(-10deg);
+  }
+
+  /* Language bubble */
+  .panel--lang :global(.lbubble) {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 300px);
+    aspect-ratio: 1.55;
+    margin: 8px auto 0;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    overflow: visible;
+  }
+
+  .panel--lang :global(.lbubble)::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    inset-inline-start: 32%;
+    width: 26px;
+    height: 26px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-top: 0;
+    border-left: 0;
+    rotate: 45deg;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+
+  .panel--lang :global(.lbubble__word) {
+    font-size: clamp(26px, 3vw, 38px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* Updates rows */
+  .rows {
+    display: grid;
+    gap: 2px;
+  }
+
+  .rows div {
+    display: grid;
+    grid-template-columns: 8px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .rows .mono {
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .dot--read {
+    background: var(--line-strong);
+  }
+
+  /* Themes: a highlight moves from one preview to the next. */
+  .themes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .theme {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 5px;
+    aspect-ratio: 3 / 4;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+  }
+
+  .theme span {
+    height: 14px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+
+  .theme i {
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  .theme i:nth-child(3) {
+    width: 70%;
+  }
+
+  .theme--light {
+    background: #f6f3ec;
+  }
+
+  .theme--light span {
+    background: #6a58dc;
+  }
+
+  .theme--light i {
+    background: #d9d4c9;
+  }
+
+  .theme--dark {
+    background: #17171f;
+  }
+
+  .theme--dark span {
+    background: #b5aaff;
+  }
+
+  .theme--dark i {
+    background: #34313f;
+  }
+
+  .theme--black {
+    background: #000;
+  }
+
+  .theme--black span {
+    background: #b5aaff;
+  }
+
+  .theme--black i {
+    background: #222;
+  }
+
+  .theme::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 13px;
+    border: 2px solid var(--accent);
+    opacity: 0;
+  }
+
+  :global(.is-revealed) .theme::after {
+    animation: theme-pick 6s var(--ease) infinite;
+  }
+
+  :global(.is-revealed) .theme--dark::after {
+    animation-delay: 2s;
+  }
+
+  :global(.is-revealed) .theme--black::after {
+    animation-delay: 4s;
+  }
+
+  @keyframes theme-pick {
+    0%,
+    30% {
+      opacity: 1;
+    }
+    36%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Offline ring */
+  .ring {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    color: var(--text);
+  }
+
+  .ring svg:first-child {
+    width: 100%;
+    height: 100%;
+    rotate: -90deg;
+  }
+
+  .ring circle {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 3.5;
+  }
+
+  .ring .ring__fill {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.6s var(--ease) 0.4s;
+  }
+
+  :global(.is-revealed) .ring__fill {
+    stroke-dashoffset: 0.28;
+  }
+
+  .ring__icon {
+    position: absolute;
+    inset: 18px;
+  }
+
+  /* Server chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-inline-start: auto;
+  }
+
+  .chips span {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--raised);
+    color: var(--text-2);
+  }
+
+  /* ---- Motion inside the panels, played once each panel is inked in ---- */
+
+  /* Covers flip in one by one, and fan out on hover. */
+  .covers :global(.kcover) {
+    opacity: 0;
+    transform: rotateY(-80deg);
+    transform-origin: 0 50%;
+  }
+
+  .panel:global(.is-revealed) .covers :global(.kcover) {
+    animation: cover-flip 700ms var(--ease) both;
+  }
+
+  .panel:global(.is-revealed) .covers :global(.kcover:nth-child(2)) {
+    animation-delay: 90ms;
+  }
+
+  .panel:global(.is-revealed) .covers :global(.kcover:nth-child(3)) {
+    animation-delay: 180ms;
+  }
+
+  .panel:global(.is-revealed) .covers :global(.kcover:nth-child(4)) {
+    animation-delay: 270ms;
+  }
+
+  .panel:global(.is-revealed) .covers :global(.kcover:nth-child(5)) {
+    animation-delay: 360ms;
+  }
+
+  .panel:global(.is-revealed) .covers :global(.kcover:nth-child(6)) {
+    animation-delay: 450ms;
+  }
+
+  @keyframes cover-flip {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .panel--library:hover .covers :global(.kcover:nth-child(3n + 1)) {
+    translate: -4px -4px;
+    rotate: -3deg;
+  }
+
+  .panel--library:hover .covers :global(.kcover:nth-child(3n)) {
+    translate: 4px -4px;
+    rotate: 3deg;
+  }
+
+  .covers :global(.kcover) {
+    transition:
+      translate var(--mid) var(--ease),
+      rotate var(--mid) var(--ease);
+  }
+
+  /* Update rows slide in; the unread dots pulse once. */
+  .rows div {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  .panel:global(.is-revealed) .rows div {
+    animation: row-in 500ms var(--ease) both;
+  }
+
+  .panel:global(.is-revealed) .rows div:nth-child(2) {
+    animation-delay: 120ms;
+  }
+
+  .panel:global(.is-revealed) .rows div:nth-child(3) {
+    animation-delay: 240ms;
+  }
+
+  @keyframes row-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .panel:global(.is-revealed) .dot:not(.dot--read) {
+    animation: dot-pulse 900ms var(--ease) 700ms 2;
+  }
+
+  @keyframes dot-pulse {
+    50% {
+      box-shadow: 0 0 0 5px rgb(181 170 255 / 0.25);
+    }
+  }
+
+  /* The download arrow drops in as the ring fills. */
+  .panel:global(.is-revealed) .ring__icon {
+    animation: arrow-drop 800ms cubic-bezier(0.34, 1.5, 0.64, 1) 300ms both;
+  }
+
+  @keyframes arrow-drop {
+    from {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+  }
+
+  /* Server chips pop in along a sync line that draws across. */
+  .chips {
+    position: relative;
+  }
+
+  .chips__sync {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    width: 100%;
+    height: 10px;
+    translate: 0 -50%;
+    z-index: 0;
+    overflow: visible;
+  }
+
+  .chips__sync path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 0.01 0.02;
+    stroke-dashoffset: 1;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.6;
+  }
+
+  .panel:global(.is-revealed) .chips__sync path {
+    animation: sync-draw 1.2s var(--ease) 200ms both;
+  }
+
+  @keyframes sync-draw {
+    from {
+      stroke-dasharray: 0 1;
+    }
+    to {
+      stroke-dasharray: 1 0;
+    }
+  }
+
+  .chips span {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .panel:global(.is-revealed) .chips span {
+    animation: chip-pop 450ms cubic-bezier(0.34, 1.5, 0.64, 1) both;
+  }
+
+  .panel:global(.is-revealed) .chips span:nth-of-type(2) {
+    animation-delay: 150ms;
+  }
+
+  .panel:global(.is-revealed) .chips span:nth-of-type(3) {
+    animation-delay: 300ms;
+  }
+
+  .panel:global(.is-revealed) .chips span:nth-of-type(4) {
+    animation-delay: 450ms;
+  }
+
+  @keyframes chip-pop {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .covers :global(.kcover),
+    .rows div,
+    .chips span {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .mp__page {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .panel--library,
+    .panel--lang,
+    .panel--server {
+      grid-column: span 2;
+      grid-row: auto;
+    }
+
+    .panel--updates,
+    .panel--themes,
+    .panel--offline {
+      grid-column: span 2;
+    }
+
+    .panel--server {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .chips {
+      justify-content: flex-start;
+      margin-inline-start: 0;
+    }
+  }
+</style>

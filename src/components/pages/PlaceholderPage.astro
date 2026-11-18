@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../ui/Icon.astro';
+import { Image } from 'astro:assets';
+import kiriJump from '../../assets/kiri/loading.png';
+import { localizedPath } from '../../i18n/locales';
+import { useTranslations } from '../../i18n/ui';
+import { links, pageTitleKey, type PageSlug } from '../../data/site';
+
+interface Props {
+  slug: string;
+  page: PageSlug;
+}
+
+const { slug, page } = Astro.props;
+const t = useTranslations(slug);
+const title = t(pageTitleKey[page]);
+---
+
+<BaseLayout slug={slug} path={page} title={title} noindex>
+  <section class="soon">
+    <div class="wrap soon__inner">
+      <Image src={kiriJump} alt="" width={280} class="soon__art" loading="eager" />
+      <p class="mono soon__eyebrow">{t('soon.title')}</p>
+      <h1>{title}</h1>
+      <p class="soon__body">{t('soon.body')}</p>
+      <div class="soon__actions">
+        <a class="btn btn-primary" href={links.github} rel="noopener">
+          <Icon name="github" />
+          {t('soon.cta')}
+        </a>
+        <a class="btn btn-secondary" href={localizedPath(slug)}>{t('home.back')}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .soon {
+    padding-block: clamp(80px, 12vw, 160px);
+    text-align: center;
+  }
+
+  .soon__eyebrow {
+    color: var(--muted);
+  }
+
+  .soon__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    max-width: 40rem;
+  }
+
+  .soon :global(.soon__art) {
+    width: min(280px, 64vw);
+    height: auto;
+    animation: soon-hop 2.4s var(--ease) infinite;
+  }
+
+  @keyframes soon-hop {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-12px) rotate(-2deg);
+    }
+  }
+
+  h1 {
+    font-size: clamp(30px, 3.4vw, 44px);
+    letter-spacing: -0.025em;
+  }
+
+  .soon__body {
+    color: var(--text-2);
+    font-size: 17px;
+  }
+
+  .soon__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+
+</style>

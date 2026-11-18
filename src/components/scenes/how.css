@@ -1,0 +1,386 @@
+/* How it works: the exploded phone. */
+.how {
+  --sw: clamp(110px, min(17vw, 22svh), 200px);
+  --sh: calc(var(--sw) * 2.05);
+}
+
+.how__track {
+  height: 340vh;
+}
+
+.how__frame {
+  position: sticky;
+  top: var(--header);
+  height: calc(100svh - var(--header));
+  overflow: clip;
+}
+
+.how__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 48px;
+  height: 100%;
+}
+
+.how__switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 32px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.how__switch button {
+  position: relative;
+  z-index: 1;
+  height: 36px;
+  padding: 0 24px;
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  font: 500 14px/1 var(--font);
+  cursor: pointer;
+  transition: color var(--fast);
+}
+
+.how__switch button[aria-pressed='true'] {
+  color: var(--text);
+}
+
+.how__switch button span {
+  position: relative;
+  z-index: 1;
+}
+
+.how__thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  inset-inline-start: 4px;
+  width: calc(50% - 4px);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25), inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.how__mode {
+  min-height: 84px;
+  margin-top: 20px;
+  max-width: 30rem;
+  color: var(--text-2);
+}
+
+.how__note {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+/* Isometric stage */
+.how__stage {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  perspective: 2200px;
+}
+
+.iso {
+  position: relative;
+  width: var(--sw);
+  height: var(--sh);
+  transform-style: preserve-3d;
+  margin-top: 16%;
+  margin-inline-end: min(220px, 34%);
+}
+
+.slab {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--sw) * 0.16);
+  transform-style: preserve-3d;
+}
+
+.slab::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgb(0 0 0 / 0.45);
+  transform: translateZ(-6px);
+}
+
+.slab--source {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+}
+
+.slab--library {
+  background: var(--bg-deep);
+  border: 1px solid var(--line-strong);
+}
+
+.slab--reader {
+  background: var(--paper);
+  overflow: visible;
+}
+
+.slab__frame {
+  position: absolute;
+  inset: -7px;
+  border-radius: calc(var(--sw) * 0.19);
+  border: 7px solid #0b0b10;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+  pointer-events: none;
+}
+
+.slab__frame::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 30%;
+  height: 12px;
+  translate: -50% 0;
+  border-radius: 8px;
+  background: #000;
+}
+
+/* Legend: a 2D list beside the stack, so 3D layers never cover it. */
+.how__legend {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 50%;
+  display: grid;
+  gap: 28px;
+  width: min(220px, 34%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  translate: 0 -40%;
+  pointer-events: none;
+}
+
+.how__legend li {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  column-gap: 8px;
+  padding-inline-start: 12px;
+  border-inline-start: 1px solid var(--line-strong);
+}
+
+.how__legend-n {
+  grid-row: span 2;
+  color: var(--muted);
+  padding-top: 3px;
+}
+
+.how__legend b {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.how__legend-note {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 15px;
+}
+
+/* Reader layer */
+.reader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 26px 6px 6px;
+  overflow: hidden;
+  border-radius: inherit;
+  font-size: 9px;
+}
+
+.reader .cp {
+  flex: none;
+  border-width: 1.5px;
+}
+
+.reader__bar {
+  position: absolute;
+  inset: auto 10px 10px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgb(18 18 26 / 0.6);
+  border: 1px solid rgb(255 255 255 / 0.2);
+}
+
+/* Library layer */
+.lib {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-content: start;
+  gap: 8px;
+  padding: 26px 12px 12px;
+}
+
+.lib .kcover__vol,
+.lib .kcover__badge {
+  display: none;
+}
+
+/* Source layer */
+.src {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 14px;
+}
+
+.src__row {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-items: center;
+  column-gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--text-2);
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.src__row span {
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.src__row em {
+  grid-column: 2;
+  font-style: normal;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.src__server {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 56px;
+  margin-bottom: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg-deep);
+  color: var(--text-2);
+}
+
+.src__led {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: led 1.6s steps(2, jump-none) infinite;
+}
+
+.src__led--2 {
+  inset-inline-end: 24px;
+  animation-delay: 0.5s;
+}
+
+@keyframes led {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (max-width: 1180px) {
+  .how__legend-note {
+    display: none;
+  }
+
+  .how__legend {
+    gap: 18px;
+    width: 120px;
+  }
+
+  .iso {
+    margin-inline-end: 120px;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 720px) {
+  .how__copy .lead-text {
+    display: none;
+  }
+}
+
+@media (max-width: 719px) {
+  .how {
+    --sw: clamp(96px, min(30vw, 17svh), 150px);
+  }
+
+  .how__track {
+    height: 300vh;
+  }
+
+  .how__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    gap: 0;
+    padding-top: 24px;
+  }
+
+  .how__stage {
+    align-items: center;
+    padding-bottom: 10svh;
+  }
+
+  .iso {
+    margin-top: 0;
+    margin-inline-end: 0;
+  }
+
+  .how__copy .lead-text,
+  .how__note {
+    display: none;
+  }
+
+  .how__switch {
+    margin-top: 16px;
+  }
+
+  .how__mode {
+    min-height: 0;
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  .how__legend {
+    top: auto;
+    bottom: 4svh;
+    translate: none;
+    grid-auto-flow: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .how__legend li {
+    grid-template-columns: 1fr;
+  }
+
+  .how__legend-n {
+    display: none;
+  }
+}

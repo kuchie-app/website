@@ -1,0 +1,371 @@
+---
+/**
+ * Features: every group as a chapter with its own folio and a Kiri pose,
+ * a sticky index that follows the scroll, and Local vs Server side by side.
+ */
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from './PageHead.astro';
+import { localizedPath } from '../../i18n/locales';
+import { pagesCopy } from '../../i18n/pages';
+import intro from '../../assets/kiri/intro.png';
+import ready from '../../assets/kiri/kiri-ready.png';
+import sitting from '../../assets/kiri/kiri-loading.png';
+import offline from '../../assets/kiri/offline.png';
+import fetchFailed from '../../assets/kiri/fetch-failed.png';
+import complete from '../../assets/kiri/complete.png';
+import jump from '../../assets/kiri/loading.png';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const c = pagesCopy(slug).features;
+const poses = [intro, ready, sitting, offline, fetchFailed, complete, jump];
+---
+
+<BaseLayout slug={slug} path="features" title={c.title} description={c.lede}>
+  <PageHead folio="Kuchie" title={c.title} lede={c.lede} kiri={jump} />
+
+  <div class="wrap feat">
+    <nav class="feat__index" aria-label={c.nav}>
+      <p class="mono">{c.nav}</p>
+      <span class="feat__rail" aria-hidden="true"><span></span></span>
+      <ol>
+        {
+          c.groups.map((g, i) => (
+            <li>
+              <a href={`#${g.id}`} data-index-link={g.id}>
+                <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+                {g.title}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <div class="feat__body">
+      {
+        c.groups.map((g, i) => (
+          <section class="fgroup" id={g.id} data-index-section={g.id}>
+            <div class="fgroup__head" data-reveal>
+              <p class="folio mono">
+                <b>{String(i + 1).padStart(2, '0')}</b>
+                <span>{g.title}</span>
+              </p>
+              <h2 class="h2" data-reveal="title">{g.title}</h2>
+              <p class="lead-text">{g.body}</p>
+            </div>
+            <Image src={poses[i % poses.length]!} alt="" width={220} class="fgroup__kiri" loading="lazy" data-reveal="pop" data-reveal-delay="150" />
+            <ul class="fgroup__items" role="list">
+              {g.items.map(([title, body], j) => (
+                <li data-reveal data-reveal-delay={String(j * 70)}>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+
+      <section class="compare" data-reveal>
+        <h2 class="h2">{c.compare.title}</h2>
+        <div class="compare__scroll">
+          <table>
+            <thead>
+              <tr>{c.compare.cols.map((col) => <th scope="col">{col}</th>)}</tr>
+            </thead>
+            <tbody>
+              {
+                c.compare.rows.map(([label, a, b]) => (
+                  <tr>
+                    <th scope="row">{label}</th>
+                    <td>{a}</td>
+                    <td>{b}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="compare__cta">
+          <a class="btn btn-primary" href={localizedPath(slug, 'guides/getting-started')}>{c.cta}</a>
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // The index highlights the group currently on screen.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('[data-index-link]')].map((a) => [a.dataset.indexLink, a]),
+  );
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a) => a.removeAttribute('aria-current'));
+        links.get((e.target as HTMLElement).dataset.indexSection)?.setAttribute('aria-current', 'true');
+      }
+    },
+    { rootMargin: '-40% 0px -55% 0px' },
+  );
+  document.querySelectorAll('[data-index-section]').forEach((s) => io.observe(s));
+</script>
+
+<style>
+  .feat {
+    timeline-scope: --feat;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 64px;
+    padding-bottom: 96px;
+  }
+
+  .feat__index {
+    position: sticky;
+    top: calc(var(--header) + 32px);
+    align-self: start;
+  }
+
+  .feat__body {
+    view-timeline-name: --feat;
+  }
+
+  /* Reading progress through the features, next to the index. */
+  .feat__rail {
+    position: absolute;
+    inset-block: 28px 0;
+    inset-inline-start: -14px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .feat__rail span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    transform-origin: 50% 0;
+    transform: scaleY(0);
+  }
+
+  @supports (animation-timeline: view()) {
+    .feat__rail span {
+      animation: rail-fill linear both;
+      animation-timeline: --feat;
+      animation-range: contain;
+    }
+  }
+
+  @keyframes rail-fill {
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  .feat__index .mono {
+    margin-bottom: 12px;
+    color: var(--muted);
+  }
+
+  .feat__index ol {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .feat__index a {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--text-2);
+    font-size: 14px;
+    transition:
+      color var(--fast),
+      background-color var(--fast);
+  }
+
+  .feat__index a .mono {
+    margin: 0;
+    padding-top: 2px;
+  }
+
+  .feat__index a:hover {
+    color: var(--text);
+  }
+
+  .feat__index a[aria-current] {
+    color: var(--text);
+    background: var(--raised);
+  }
+
+  .feat__index a[aria-current]::before {
+    content: '';
+    position: absolute;
+    inset-block: 8px;
+    inset-inline-start: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+
+  .fgroup {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px 32px;
+    padding-block: 56px;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: calc(var(--header) + 16px);
+  }
+
+  .fgroup:first-child {
+    border-top: 0;
+    padding-top: 8px;
+  }
+
+  .fgroup :global(.fgroup__kiri) {
+    width: clamp(96px, 12vw, 160px);
+    height: auto;
+    align-self: end;
+    transition: transform var(--slow) var(--ease);
+  }
+
+  .fgroup:hover :global(.fgroup__kiri) {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+
+  [dir='rtl'] .fgroup :global(.fgroup__kiri) {
+    scale: -1 1;
+  }
+
+  .fgroup__items {
+    list-style: none;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+
+  .fgroup__items {
+    perspective: 900px;
+  }
+
+  .fgroup__items li {
+    transition:
+      border-color var(--mid) var(--ease),
+      transform var(--mid) var(--ease);
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background: var(--surface);
+    transition: border-color var(--mid) var(--ease);
+  }
+
+  .fgroup__items li:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-3px) rotateX(4deg);
+  }
+
+  .fgroup__items h3 {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .fgroup__items p {
+    margin-top: 6px;
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .compare {
+    padding-top: 56px;
+    border-top: 1px solid var(--line);
+  }
+
+  .compare__scroll {
+    margin-top: 24px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+
+  table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  th,
+  td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  thead th {
+    color: var(--muted);
+    font: 500 12px/16px var(--mono);
+  }
+
+  tbody th {
+    color: var(--text-2);
+    font-weight: 400;
+  }
+
+  tbody tr {
+    transition: background-color var(--fast);
+  }
+
+  tbody tr:hover {
+    background: var(--raised);
+  }
+
+  .compare__cta {
+    margin-top: 32px;
+  }
+
+  @media (max-width: 960px) {
+    .feat {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .feat__index {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .fgroup {
+      grid-template-columns: 1fr;
+    }
+
+    .fgroup :global(.fgroup__kiri) {
+      display: none;
+    }
+
+    .fgroup__items {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

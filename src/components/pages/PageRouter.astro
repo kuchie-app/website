@@ -1,0 +1,22 @@
+---
+/** Renders a marketing page by its slug; pages not written yet show the placeholder. */
+import DownloadPage from './DownloadPage.astro';
+import FeaturesPage from './FeaturesPage.astro';
+import ChangelogPage from './ChangelogPage.astro';
+import FaqPage from './FaqPage.astro';
+import PlaceholderPage from './PlaceholderPage.astro';
+import type { PageSlug } from '../../data/site';
+
+interface Props {
+  slug: string;
+  page: PageSlug;
+}
+
+const { slug, page } = Astro.props;
+---
+
+{page === 'features' && <FeaturesPage slug={slug} />}
+{page === 'download' && <DownloadPage slug={slug} />}
+{page === 'changelog' && <ChangelogPage slug={slug} />}
+{page === 'faq' && <FaqPage slug={slug} />}
+{!['features', 'download', 'changelog', 'faq'].includes(page) && <PlaceholderPage slug={slug} page={page} />}

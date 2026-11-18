@@ -1,0 +1,473 @@
+/* Hero with the 3D book. */
+.cover {
+  --bw: clamp(150px, 19vw, 260px);
+  --bh: calc(var(--bw) * 1.42);
+  --depth: 16px;
+  position: relative;
+}
+
+.cover__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  column-gap: 48px;
+}
+
+.cover__copy {
+  position: sticky;
+  top: var(--header);
+  align-self: start;
+  height: calc(100svh - var(--header));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 32px 64px;
+}
+
+.cover__title {
+  font-size: clamp(38px, 4.3vw, 60px);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+}
+
+:lang(ar) .cover__title,
+:lang(th) .cover__title,
+:lang(ta) .cover__title {
+  line-height: 1.35;
+}
+
+.cover__line {
+  display: block;
+  overflow: clip;
+  padding-bottom: 0.06em;
+}
+
+.cover__line > span {
+  display: block;
+  animation: cover-line 900ms var(--ease) both;
+  animation-delay: calc(80ms + var(--i) * 70ms);
+}
+
+@keyframes cover-line {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+.cover__lede,
+.cover__actions,
+.cover__meta {
+  animation: cover-rise 700ms var(--ease) both;
+}
+
+.cover__lede {
+  margin-top: 24px;
+  max-width: 34rem;
+  color: var(--text-2);
+  font-size: 19px;
+  line-height: 30px;
+  animation-delay: 320ms;
+}
+
+.cover__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  margin-top: 32px;
+  animation-delay: 420ms;
+}
+
+.cover__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+  color: var(--muted);
+  animation-delay: 520ms;
+}
+
+@keyframes cover-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* The scroll track that drives the book */
+.cover__track {
+  height: 280vh;
+}
+
+.cover__stage {
+  position: sticky;
+  top: var(--header);
+  height: calc(100svh - var(--header));
+  display: grid;
+  place-items: center;
+  perspective: 1800px;
+}
+
+.book-wrap {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.book {
+  position: relative;
+  width: var(--bw);
+  height: var(--bh);
+  transform-style: preserve-3d;
+}
+
+.book__back,
+.book__spine,
+.book__edge,
+.book__page-static,
+.leaf,
+.leaf__face {
+  position: absolute;
+}
+
+.book__back {
+  inset: 0;
+  border-radius: 3px 8px 8px 3px;
+  background: #18142d;
+  transform: translateZ(calc(var(--depth) * -1));
+}
+
+.book__spine {
+  top: 0;
+  left: 0;
+  width: var(--depth);
+  height: 100%;
+  background: linear-gradient(90deg, #120f22, #231d40 60%, #18142d);
+  transform-origin: 0 50%;
+  transform: rotateY(90deg);
+}
+
+.book__edge {
+  background: repeating-linear-gradient(90deg, #ece6dc 0 1px, #d9d2c6 1px 2px);
+}
+
+.book__edge--side {
+  top: 2px;
+  right: 0;
+  width: var(--depth);
+  height: calc(100% - 4px);
+  background: repeating-linear-gradient(90deg, #ece6dc 0 1px, #d6cfc3 1px 2px);
+  transform-origin: 100% 50%;
+  transform: rotateY(-90deg);
+}
+
+.book__edge--top,
+.book__edge--bottom {
+  left: 2px;
+  width: calc(100% - 4px);
+  height: var(--depth);
+  background: repeating-linear-gradient(0deg, #ece6dc 0 1px, #d6cfc3 1px 2px);
+}
+
+.book__edge--top {
+  top: 0;
+  transform-origin: 50% 0;
+  transform: rotateX(-90deg);
+}
+
+.book__edge--bottom {
+  bottom: 0;
+  transform-origin: 50% 100%;
+  transform: rotateX(90deg);
+}
+
+.book__page-static {
+  inset: 0;
+  overflow: hidden;
+  border-radius: 1px 6px 6px 1px;
+  background: var(--paper);
+  box-shadow: inset 10px 0 18px -12px rgb(0 0 0 / 0.35);
+}
+
+/* Leaves turn around the spine */
+.leaf {
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 0 50%;
+}
+
+[dir='rtl'] .leaf {
+  transform-origin: 100% 50%;
+}
+
+.leaf__face {
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 1px 6px 6px 1px;
+  background: var(--paper);
+}
+
+.leaf__back {
+  transform: rotateY(180deg);
+  border-radius: 6px 1px 1px 6px;
+}
+
+.leaf__front {
+  box-shadow: inset 10px 0 18px -12px rgb(0 0 0 / 0.35);
+}
+
+.leaf__back {
+  box-shadow: inset -10px 0 18px -12px rgb(0 0 0 / 0.35);
+}
+
+.leaf__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.1));
+}
+
+.leaf__shade--back {
+  background: linear-gradient(270deg, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.05));
+}
+
+/* Front cover */
+.cover-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 18px;
+  background: #18142d;
+  color: var(--paper);
+  border-radius: 1px 6px 6px 1px;
+  box-shadow: inset 6px 0 0 rgb(255 255 255 / 0.04), inset 14px 0 0 rgb(0 0 0 / 0.18);
+}
+
+.cover-art__vol {
+  position: absolute;
+  top: 16px;
+  inset-inline-end: 16px;
+  color: #a7a2c2;
+  font-size: 10px;
+}
+
+.cover-art__title {
+  position: relative;
+  display: block;
+  margin-top: 8px;
+  font-size: calc(var(--bw) * 0.17);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.cover-art__sub {
+  position: relative;
+  display: block;
+  margin-top: 6px;
+  color: #c9c4de;
+  font-size: calc(var(--bw) * 0.048);
+}
+
+.cover-art__scene {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 78%;
+}
+
+/* Inside cover */
+.inside-cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  background: #ebe5f8;
+  color: #6b6676;
+}
+
+.inside-cover__line {
+  width: 90px;
+  height: 1px;
+  background: #b9b2cc;
+}
+
+/* Ribbon bookmark: the Bookmark Scarf */
+.book__ribbon {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 66%;
+  width: 14px;
+  height: calc(var(--bh) + 56px);
+  transform-origin: 50% 0;
+  transform: translateZ(calc(var(--depth) * -0.5));
+}
+
+.book__ribbon svg {
+  width: 100%;
+  height: 100%;
+  fill: #b5aaff;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.25));
+}
+
+.book__shadow {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: calc(var(--bh) * -0.12);
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.45), transparent);
+  transform: translateZ(-60px);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+:root[data-theme='light'] .book__shadow {
+  background: radial-gradient(closest-side, rgb(27 26 34 / 0.25), transparent);
+}
+
+.cover__hint {
+  position: absolute;
+  bottom: 32px;
+  inset-inline: 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Small screens: the headline scrolls normally, the book pins under it. */
+@media (max-width: 719px) {
+  .cover {
+    --bw: min(40vw, 190px);
+  }
+
+  .cover__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cover__copy {
+    position: relative;
+    top: auto;
+    height: auto;
+    padding-block: 40px 16px;
+  }
+
+  .cover__title {
+    font-size: clamp(30px, 8.4vw, 44px);
+  }
+
+  .cover__stage {
+    align-items: start;
+    padding-top: 6svh;
+  }
+
+  .cover__lede {
+    font-size: 17px;
+    line-height: 28px;
+  }
+
+  .cover__track {
+    height: 220vh;
+  }
+
+  .cover__stage {
+    height: min(66svh, 560px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover__track {
+    height: auto;
+  }
+
+  .cover__stage {
+    position: relative;
+    height: 70svh;
+  }
+
+  .cover__line > span,
+  .cover__lede,
+  .cover__actions,
+  .cover__meta {
+    animation: none;
+  }
+}
+
+/* Kiri beside the book */
+.companion {
+  position: absolute;
+  z-index: 20;
+  inset-inline-start: calc(var(--bw) * -0.95);
+  bottom: calc(var(--bh) * -0.16);
+  width: calc(var(--bw) * 0.78);
+  transform: translateZ(80px);
+  pointer-events: none;
+}
+
+.companion__body img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+}
+
+[dir='rtl'] .companion__body img {
+  scale: -1 1;
+}
+
+.companion__shadow {
+  position: absolute;
+  inset-inline: 18%;
+  bottom: 2%;
+  z-index: -1;
+  height: 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.35), transparent);
+}
+
+@media (max-width: 719px) {
+  .companion {
+    inset-inline-start: calc(var(--bw) * -0.7);
+    width: calc(var(--bw) * 0.66);
+  }
+}
+
+/* The scarf flying out of (and back into) the book */
+.flyer {
+  position: absolute;
+  z-index: 30;
+  top: 10%;
+  left: 0;
+  width: var(--bw);
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+
+.flyer svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 16px rgb(0 0 0 / 0.35));
+}
+
+[dir='rtl'] .flyer {
+  scale: -1 1;
+}
+
+/* Lightning over the whole hero */
+.stage-flash {
+  position: absolute;
+  inset: calc(var(--header) * -1) -50vw 0;
+  z-index: 25;
+  background: #fff;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+:root[data-theme='light'] .stage-flash {
+  mix-blend-mode: normal;
+  background: #18142d;
+}

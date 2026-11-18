@@ -1,0 +1,14 @@
+---
+import PageRouter from '../../components/pages/PageRouter.astro';
+import { prefixedLocales } from '../../i18n/locales';
+import { pages, type PageSlug } from '../../data/site';
+
+export function getStaticPaths() {
+  return prefixedLocales.flatMap((l) => pages.map((page) => ({ params: { lang: l.slug, page } })));
+}
+
+const { lang } = Astro.params;
+const page = Astro.params.page as PageSlug;
+---
+
+<PageRouter slug={lang} page={page} />

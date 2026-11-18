@@ -1,0 +1,19 @@
+{
+  "repo": "kuchie-app/Kuchie",
+  "fetchedAt": "2026-11-18T16:54:56.045Z",
+  "releases": [
+    {
+      "version": "1.0.0",
+      "tag": "v1.0.0",
+      "date": "2026-11-17T00:24:54Z",
+      "url": "https://github.com/kuchie-app/Kuchie/releases/tag/v1.0.0",
+      "notes": "First public release.\n\n### Collections\n- Choose **Local** or **Server** at first launch and switch any time; each collection keeps its own library, history and downloads.\n- **Server**: Suwayomi libraries, updates, history, download queue, trackers, migration and backups, with network discovery and no-auth, basic or UI-login servers.\n- **Local**: import CBZ/ZIP archives and image folders, Kuchie extension repositories, and offline chapters saved on the iPhone.\n\n### Mihon extension stores\n- Add any store Mihon accepts: v2 indexes (`index.pb` protobuf or JSON, gzipped or not, with `extensionListUrl`), `repo.json` with `index_v2`, legacy `index.min.json`, and `mihon://` / `tachiyomi://add-repo` links. Tested with Keiyoushi, Suwayomi and Yūzōnō stores.\n- Every APK's Signature Scheme v2/v3 signature is verified. APKs signed by their store's key install directly; others install only after you trust their signer, as in Mihon. Tampered APKs, plain-HTTP stores and stores that change their key are refused with a clear message.\n\n### Reader and app\n- Paged and continuous reading modes, chapter-to-chapter reading and page actions. Webtoon (continuous vertical) is the default.\n- The page slider starts at page 1 on the left in every reading direction.\n- Live Activities and Dynamic Island for downloads, Liquid Glass controls on iOS 26, themes, alternate app icons and 20+ languages.\n- The in-app update check and project links point to github.com/kuchie-app/Kuchie by default.\n\n### Fixed\n- History showed the resume page one lower than the reader (for example 1/18 while reading page 2).\n- Library category filters could notify listeners while a widget was building, which Riverpod forbids.\n- Release logging, HTTP client leaks and startup crash handling.\n\n### Extension runtime and compatibility\n- The embedded runtime is M-Extension-Server v1.0.8.1, built for iOS with three Kuchie patches (extension user-agents, detached views, WebP and bitmap pixels). Release IPAs include it.\n- Cloudflare challenges are solved in a hidden WebView, using Mangayomi's remote WebView bridge.\n- **Source settings** for extensions that offer them (server addresses, logins, languages, mirrors).\n- Untrusted APKs (not signed by their store's key, or from stores without a SHA-256 key) install after you trust their signer, as in Mihon. Anime extensions and unsupported extension-lib versions are left out, as in Mihon.\n- Fixed: UTF-8 requests to the runtime, full chapter data for page lists, empty URLs, large catalogues, long APK loads, and the 32-store limit.\n- Tested against 80 public stores and 211 extensions with Suwayomi-Server as a reference; see docs/extension-compatibility.md.\n\n### Known limitations\n- Some extensions apply a changed setting only after Kuchie restarts, as in Mihon.\n- Extensions built for Mihon forks (Komikku, Kotatsu, novel readers) need APIs Mihon does not have.\n\n### Install\nDownload `Kuchie-v1.0.0-unsigned.ipa`, check it against the `.sha256` file, and sideload it with AltStore, SideStore or your own signing certificate. The IPA includes the embedded extension runtime ([ios-runtime-v17](https://github.com/kuchie-app/Kuchie/releases/tag/ios-runtime-v17)).\n",
+      "ipa": {
+        "name": "Kuchie-v1.0.0-unsigned.ipa",
+        "url": "https://github.com/kuchie-app/Kuchie/releases/download/v1.0.0/Kuchie-v1.0.0-unsigned.ipa",
+        "size": 94013680
+      },
+      "sha256": "fe835b6ac797919cd15bbbcc71ca1adcced728663fac3a5361027b0f3d698683"
+    }
+  ]
+}

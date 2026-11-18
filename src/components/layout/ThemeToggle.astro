@@ -1,0 +1,83 @@
+---
+import Icon from '../ui/Icon.astro';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  slug: string;
+}
+
+const t = useTranslations(Astro.props.slug);
+---
+
+<button class="icon-btn theme" type="button" data-theme-toggle aria-label={t('theme.label')}>
+  <Icon name="moon" size={18} class="theme__moon" />
+  <Icon name="sun" size={18} class="theme__sun" />
+</button>
+
+<script>
+  // Shares Starlight's storage key so the docs and marketing pages stay in sync.
+  const KEY = 'starlight-theme';
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const root = document.documentElement;
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      const apply = () => {
+        root.dataset.theme = next;
+        try {
+          localStorage.setItem(KEY, next);
+        } catch {
+          /* storage can be unavailable */
+        }
+      };
+      const doc = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished?: Promise<void> } };
+      if (!doc.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return apply();
+      // Ink spreads from the button, like a page being turned to its other side.
+      const { clientX: x, clientY: y } = event;
+      const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      root.classList.add('theme-switching');
+      const vt = doc.startViewTransition(apply) as { ready: Promise<void>; finished?: Promise<void> };
+      vt.finished?.finally(() => root.classList.remove('theme-switching'));
+      vt.ready.then(() => {
+        document.documentElement.animate(
+          { clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+          { duration: 500, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' },
+        );
+      });
+    });
+  });
+</script>
+
+<style>
+  .theme {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .theme :global(svg) {
+    grid-area: 1 / 1;
+    transition:
+      transform var(--slow) var(--ease),
+      opacity var(--mid) var(--ease);
+  }
+
+  .theme :global(.theme__sun) {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  :global(:root[data-theme='light']) .theme :global(.theme__sun) {
+    opacity: 1;
+    transform: none;
+  }
+
+  :global(:root[data-theme='light']) .theme :global(.theme__moon) {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+
+  :global(html.theme-switching::view-transition-old(root)),
+  :global(html.theme-switching::view-transition-new(root)) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+</style>

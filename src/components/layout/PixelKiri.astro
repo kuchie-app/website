@@ -1,0 +1,179 @@
+---
+/**
+ * A pixel-art Kiri that walks back and forth above the footer. Two walk
+ * frames, a fluttering scarf, CSS only. Pauses while hovered; hidden for
+ * reduced motion.
+ */
+const palette: Record<string, string> = {
+  H: '#5a4b86', // hood
+  h: '#8576b8', // hood light
+  k: '#2d2547', // hood shadow
+  F: '#f6efe3', // face
+  E: '#141321', // eyes
+  P: '#f0a5b8', // cheeks
+  S: '#b5aaff', // scarf
+  s: '#8d7fe0', // scarf shade
+  C: '#2b2442', // cloak
+  c: '#3c3360', // cloak light
+  B: '#141321', // boots
+};
+
+const head = [
+  '......kH........',
+  '.....kHhH.......',
+  '....kHHhhH......',
+  '...kHHHhhhH.....',
+  '..kHHFFFFHHH....',
+  '..kHFFFFFFHH....',
+  '..kHFFEFFEFH....',
+  '..kHFFEFFEFH....',
+  '..kHFPFFFFPH....',
+  '...kHFFFFFH.....',
+];
+
+const frameA = [
+  ...head,
+  'SSSSSSSSSSS.....',
+  '.sSs.CccccC.....',
+  '.....CccccC.....',
+  '....CCcccCCC....',
+  '....CCCCCCCC....',
+  '....CC....CC....',
+  '...BBB....BBB...',
+];
+
+const frameB = [
+  ...head,
+  '.SSSSSSSSSS.....',
+  'sSSs.CccccC.....',
+  '.....CccccC.....',
+  '....CCcccCCC....',
+  '.....CCCCCC.....',
+  '......CCCC......',
+  '.....BBBBBB.....',
+];
+
+const pixels = (rows: string[]) =>
+  rows.flatMap((row, y) =>
+    [...row].map((ch, x) => (ch === '.' ? null : { x, y, fill: palette[ch]! })).filter(Boolean),
+  ) as { x: number; y: number; fill: string }[];
+
+const a = pixels(frameA);
+const b = pixels(frameB);
+---
+
+<div class="pk" aria-hidden="true">
+  <div class="pk__track">
+    <div class="pk__walker">
+      <svg class="pk__sprite" viewBox="0 0 16 17" shape-rendering="crispEdges">
+        <g class="pk__frame pk__frame--a">{a.map((p) => <rect x={p.x} y={p.y} width="1" height="1" fill={p.fill} />)}</g>
+        <g class="pk__frame pk__frame--b">{b.map((p) => <rect x={p.x} y={p.y} width="1" height="1" fill={p.fill} />)}</g>
+      </svg>
+      <span class="pk__shadow"></span>
+    </div>
+  </div>
+  <span class="pk__ground"></span>
+</div>
+
+<style>
+  .pk {
+    position: relative;
+    height: 56px;
+    margin-bottom: 8px;
+  }
+
+  .pk__track {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+  }
+
+  .pk__walker {
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 48px;
+    animation: pk-walk 26s linear infinite;
+  }
+
+  .pk__sprite {
+    display: block;
+    width: 48px;
+    height: 51px;
+    image-rendering: pixelated;
+    animation: pk-bob 0.5s steps(2, jump-none) infinite;
+  }
+
+  .pk__frame--b {
+    animation: pk-frame 0.5s steps(1, jump-none) infinite;
+  }
+
+  .pk__frame--a {
+    animation: pk-frame 0.5s steps(1, jump-none) infinite reverse;
+  }
+
+  .pk__shadow {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: -3px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 0.25);
+  }
+
+  .pk__ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-image: linear-gradient(90deg, var(--line-strong) 50%, transparent 50%);
+    background-size: 8px 1px;
+  }
+
+  .pk:hover .pk__walker,
+  .pk:hover .pk__sprite,
+  .pk:hover .pk__frame {
+    animation-play-state: paused;
+  }
+
+  @keyframes pk-walk {
+    0% {
+      transform: translateX(0) scaleX(1);
+    }
+    49.99% {
+      transform: translateX(calc(100cqw - 48px)) scaleX(1);
+    }
+    50% {
+      transform: translateX(calc(100cqw - 48px)) scaleX(-1);
+    }
+    100% {
+      transform: translateX(0) scaleX(-1);
+    }
+  }
+
+  @keyframes pk-frame {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pk-bob {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-2px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pk {
+      display: none;
+    }
+  }
+</style>

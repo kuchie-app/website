@@ -1,0 +1,102 @@
+---
+/**
+ * The site's signature: reading progress drawn as the Bookmark Scarf ribbon
+ * along the page edge. It draws itself with a CSS scroll-driven animation (no
+ * JavaScript); browsers without scroll timelines simply don't show it.
+ */
+---
+
+<div class="scarf" aria-hidden="true">
+  <svg viewBox="0 0 24 400" preserveAspectRatio="none">
+    <path class="scarf__track" d="M12 0 C 20 60, 4 110, 12 170 S 20 280, 12 340 L 12 400" />
+    <path class="scarf__ribbon" d="M12 0 C 20 60, 4 110, 12 170 S 20 280, 12 340 L 12 400" pathLength="1" />
+  </svg>
+  <svg class="scarf__tail" viewBox="0 0 24 20"><path d="M3 0h18v18l-9-6-9 6z" /></svg>
+</div>
+
+<style>
+  .scarf {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    @media (min-width: 1100px) {
+      .scarf {
+        position: fixed;
+        z-index: 40;
+        inset-inline-end: 12px;
+        top: calc(var(--header) + 24px);
+        bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 24px;
+        pointer-events: none;
+        animation: scarf-in linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 40vh;
+      }
+    }
+  }
+
+  svg {
+    width: 24px;
+    flex: 1;
+    overflow: visible;
+  }
+
+  path {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .scarf__track {
+    stroke: var(--line);
+  }
+
+  .scarf__ribbon {
+    stroke: var(--accent);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: scarf-draw linear both;
+    animation-timeline: scroll(root);
+  }
+
+  .scarf__tail {
+    flex: none;
+    width: 14px;
+    height: 12px;
+    margin-top: -2px;
+    fill: var(--accent);
+    opacity: 0;
+    animation: scarf-tail linear both;
+    animation-timeline: scroll(root);
+    animation-range: 92% 100%;
+  }
+
+  @keyframes scarf-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes scarf-tail {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scarf-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scarf {
+      display: none !important;
+    }
+  }
+</style>

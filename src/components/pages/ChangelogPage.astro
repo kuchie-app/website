@@ -1,0 +1,247 @@
+---
+/**
+ * Changelog: every app release from GitHub, rendered from its release notes.
+ * The data is fetched at build time (scripts/fetch-release.mjs) and the site is
+ * rebuilt on a schedule and whenever the app repository publishes a release.
+ */
+import { marked } from 'marked';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from './PageHead.astro';
+import { getLocale } from '../../i18n/locales';
+import { pagesCopy } from '../../i18n/pages';
+import { releases } from '../../data/site';
+import releasesData from '../../data/releases.json';
+import offline from '../../assets/kiri/offline.png';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const locale = getLocale(slug);
+const c = pagesCopy(slug).changelog;
+const date = (iso: string) => new Intl.DateTimeFormat(locale.lang, { dateStyle: 'long' }).format(new Date(iso));
+const rendered = await Promise.all(releases.map(async (r) => ({ ...r, html: await marked.parse(r.notes || '') })));
+---
+
+<BaseLayout slug={slug} path="changelog" title={c.title} description={c.lede}>
+  <PageHead folio={`v${releases[0]?.version ?? ""}`} title={c.title} lede={c.lede} kiri={offline}>
+    <p class="mono checked">{c.updated}: {date(releasesData.fetchedAt)}</p>
+  </PageHead>
+
+  <div class="wrap log">
+    {
+      rendered.map((r, i) => (
+        <article class={`entry${i === 0 ? ' entry--latest' : ''}`} id={r.version} data-reveal>
+          <span class="entry__dot" aria-hidden="true"></span>
+          {i === 0 && (
+            <svg class="entry__ribbon" viewBox="0 0 16 96" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 0h16v96l-8-9-8 9z" />
+            </svg>
+          )}
+          <aside class="entry__meta">
+            <a class="entry__version" href={`#${r.version}`} data-reveal="title">
+              {r.version}
+            </a>
+            {i === 0 && <span class="entry__badge mono">{c.latest}</span>}
+            <time class="mono" datetime={r.date}>
+              {date(r.date)}
+            </time>
+          </aside>
+          <div class="entry__body">
+            <div class="prose" set:html={r.html} />
+            <p class="entry__links">
+              <a class="btn btn-secondary btn-sm" href={r.ipa.url}>{c.download}</a>
+              <a class="link" href={r.url} rel="noopener">
+                {c.onGithub}
+              </a>
+            </p>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .checked {
+    margin-top: 16px;
+    color: var(--muted);
+  }
+
+  .log {
+    position: relative;
+    padding-bottom: 96px;
+    view-timeline-name: --log;
+  }
+
+  /* A timeline that draws itself down the page as you scroll. */
+  .log::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 96px;
+    inset-inline-start: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform-origin: 50% 0;
+    opacity: 0.6;
+  }
+
+  @supports (animation-timeline: view()) {
+    .log::before {
+      animation: log-draw linear both;
+      animation-timeline: --log;
+      animation-range: entry 10% exit 40%;
+    }
+  }
+
+  @keyframes log-draw {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  .entry {
+    position: relative;
+    padding-inline-start: 32px;
+  }
+
+  .entry__dot {
+    position: absolute;
+    top: 60px;
+    inset-inline-start: -5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    transform: scale(0.4);
+    transition:
+      transform 500ms cubic-bezier(0.34, 1.5, 0.64, 1) 200ms,
+      background-color 400ms var(--ease) 300ms;
+  }
+
+  .entry:global(.is-revealed) .entry__dot {
+    transform: none;
+    background: var(--accent);
+  }
+
+  /* The bookmark scarf marks the latest release. */
+  .entry__ribbon {
+    position: absolute;
+    top: -1px;
+    inset-inline-end: 24px;
+    width: 18px;
+    height: 0;
+    fill: #b5aaff;
+    transition: height 900ms cubic-bezier(0.34, 1.3, 0.64, 1) 300ms;
+  }
+
+  .entry--latest:global(.is-revealed) .entry__ribbon {
+    height: 84px;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 40px;
+    padding-block: 48px;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: calc(var(--header) + 16px);
+  }
+
+  .entry__meta {
+    position: sticky;
+    top: calc(var(--header) + 24px);
+    align-self: start;
+    display: grid;
+    justify-items: start;
+    gap: 8px;
+  }
+
+  .entry__version {
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry__badge {
+    padding: 2px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    color: var(--accent);
+  }
+
+  time {
+    color: var(--muted);
+  }
+
+  .prose {
+    max-width: 44rem;
+    color: var(--text-2);
+  }
+
+  .prose :global(h3) {
+    margin: 28px 0 8px;
+    color: var(--text);
+    font-size: 17px;
+  }
+
+  .prose :global(h3:first-child),
+  .prose :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .prose :global(ul) {
+    padding-inline-start: 20px;
+  }
+
+  .prose :global(li) {
+    margin: 6px 0;
+  }
+
+  .prose :global(code) {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--raised);
+    font: 400 0.88em var(--mono);
+  }
+
+  .prose :global(strong) {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .entry__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-top: 28px;
+  }
+
+  @media (max-width: 719px) {
+    .entry {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .entry__meta {
+      position: static;
+      grid-auto-flow: column;
+      align-items: center;
+      justify-content: start;
+      gap: 12px;
+    }
+
+    .entry__version {
+      font-size: 26px;
+    }
+  }
+</style>

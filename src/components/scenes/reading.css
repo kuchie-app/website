@@ -1,0 +1,382 @@
+/* Reading: sticky phone on the start side, steps on the end side. */
+.reading {
+  padding-block: 64px 0;
+}
+
+.reading__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+}
+
+.reading__stage {
+  position: sticky;
+  top: var(--header);
+  height: calc(100svh - var(--header));
+  display: grid;
+  place-items: center;
+}
+
+.reading__steps {
+  padding-block: 18vh 30vh;
+}
+
+.reading__head {
+  margin-bottom: 8vh;
+}
+
+.rstep {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72vh;
+  max-width: 30rem;
+}
+
+.rstep__tag {
+  color: var(--muted);
+}
+
+.rstep h3 {
+  margin-top: 12px;
+  font-size: clamp(24px, 2.4vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.rstep p {
+  margin-top: 12px;
+  color: var(--text-2);
+  font-size: 17px;
+  line-height: 28px;
+}
+
+/* Phone */
+.rphone {
+  position: relative;
+  width: clamp(190px, min(24vw, calc((100svh - var(--header) - 64px) / 2.08)), 310px);
+  aspect-ratio: 300 / 624;
+  padding: 10px;
+  border-radius: 50px;
+  background: #0b0b10;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.08),
+    0 40px 80px -40px rgb(0 0 0 / 0.7);
+}
+
+:root[data-theme='light'] .rphone {
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.1),
+    0 30px 60px -30px rgb(27 26 34 / 0.35);
+}
+
+.rphone__screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 40px;
+  background: #fff;
+  isolation: isolate;
+}
+
+.rphone__status {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 26px;
+  color: #111;
+  font: 600 13px/1 var(--font);
+  transition: color var(--mid);
+}
+
+.rphone__status.is-dark {
+  color: #fff;
+}
+
+.island {
+  position: absolute;
+  z-index: 7;
+  top: 10px;
+  left: 50%;
+  translate: -50% 0;
+  width: 92px;
+  height: 27px;
+  border-radius: 999px;
+  background: #000;
+  overflow: hidden;
+}
+
+.island__content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  padding: 0 10px 0 14px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.island__text {
+  display: grid;
+  min-width: 0;
+}
+
+.island__text b {
+  font: 500 12px/1.2 var(--font);
+}
+
+.island__text i {
+  color: #a7a5b5;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.island__ring {
+  width: 32px;
+  height: 32px;
+  margin-inline-start: auto;
+  rotate: -90deg;
+}
+
+.island__ring circle {
+  fill: none;
+  stroke-width: 3.5;
+  stroke: rgb(255 255 255 / 0.16);
+}
+
+.island__ring circle + circle {
+  stroke: #b5aaff;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+
+.rphone__strip {
+  position: absolute;
+  inset: 0 0 auto;
+}
+
+.paged {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  background: #0c0c12;
+  perspective: 900px;
+}
+
+.paged__sheet {
+  position: absolute;
+  inset: 52px 10px 70px;
+  transform-origin: 50% 50%;
+}
+
+.paged__sheet .bp {
+  border-radius: 4px;
+  padding: 8px 8px 20px;
+}
+
+.rphone__top {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100px;
+  padding: 46px 16px 0;
+  color: #fff;
+  background: linear-gradient(rgb(12 12 18 / 0.92), transparent);
+}
+
+.rphone__top b {
+  display: block;
+  font: 500 13px/1.2 var(--font);
+}
+
+.rphone__top i {
+  color: #b9b7c4;
+  font: 400 11px/1.2 var(--font);
+  font-style: normal;
+}
+
+.rglass {
+  background: rgb(18 18 26 / 0.58);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  backdrop-filter: blur(14px) saturate(1.6);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 8px 20px -10px rgb(0 0 0 / 0.45);
+}
+
+.rphone__slider {
+  position: absolute;
+  z-index: 5;
+  inset: auto 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 21px;
+  color: #fff;
+}
+
+.rphone__slider .mono {
+  min-width: 46px;
+  font-size: 11px;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.rphone__track {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.35);
+}
+
+.rphone__track span {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: #fff;
+  transform-origin: 0 50%;
+}
+
+.rphone__sheet {
+  position: absolute;
+  z-index: 6;
+  inset: auto 10px 70px;
+  padding: 12px;
+  border-radius: 22px;
+  color: #fff;
+}
+
+.rphone__sheet > .mono {
+  display: block;
+  margin-bottom: 8px;
+  color: #d9d7e3;
+}
+
+.rphone__modes {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.rphone__modes > span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: 34px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.08);
+  font: 500 11px/1 var(--font);
+}
+
+.rphone__modes em {
+  position: relative;
+  z-index: 1;
+  font-style: normal;
+  transition: color var(--mid);
+}
+
+.rphone__modes .is-on em {
+  color: #111118;
+}
+
+.rphone__pill {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  width: calc(50% - 3px);
+  height: 34px;
+  z-index: 0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+@media (max-width: 1100px) and (min-width: 720px) {
+  .reading__grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+
+@media (max-width: 719px) {
+  .reading__grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .reading__stage {
+    z-index: 2;
+    height: 52svh;
+    align-items: start;
+    padding-top: 8px;
+    background: linear-gradient(var(--bg) 88%, transparent);
+  }
+
+  .rphone {
+    width: min(200px, calc(48svh / 2.08));
+    border-radius: 36px;
+    padding: 7px;
+  }
+
+  .rphone__screen {
+    border-radius: 30px;
+  }
+
+  .rphone__status {
+    height: 34px;
+    padding: 0 18px;
+    font-size: 10px;
+  }
+
+  .island {
+    top: 7px;
+  }
+
+  .island__content {
+    gap: 6px;
+    padding: 0 6px 0 10px;
+  }
+
+  .island__content svg:first-child {
+    width: 16px;
+    height: 16px;
+  }
+
+  .island__text b {
+    font-size: 10px;
+  }
+
+  .island__text i {
+    font-size: 8px;
+  }
+
+  .island__ring {
+    width: 24px;
+    height: 24px;
+  }
+
+  .strip {
+    font-size: 11px;
+  }
+
+  .reading__steps {
+    padding-block: 4vh 20vh;
+  }
+
+  .rstep {
+    min-height: 56vh;
+  }
+}

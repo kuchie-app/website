@@ -1,0 +1,126 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource/jetbrains-mono/latin-400.css';
+import '@fontsource/jetbrains-mono/latin-500.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import ScarfProgress from '../components/layout/ScarfProgress.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { defaultLocale, getLocale, isIndexed, locales, localizedPath } from '../i18n/locales';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  slug: string;
+  /** English path without slashes, e.g. `download`; empty for the home page. */
+  path: string;
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const { slug, path, title, description, noindex = false } = Astro.props;
+const locale = getLocale(slug);
+const t = useTranslations(slug);
+const site = Astro.site ?? new URL('https://kuchie.app');
+const pageTitle = title ? `${title} · Kuchie` : `Kuchie · ${t('hero.title')}`;
+const pageDescription = description ?? t('meta.description');
+// Untranslated languages point search engines at the English page.
+const canonical = new URL(localizedPath(isIndexed(slug) ? slug : defaultLocale, path), site);
+const alternates = locales.filter((l) => isIndexed(l.slug));
+const ogImage = new URL(slug === 'id' ? '/og/id.png' : '/og/default.png', site);
+---
+
+<!doctype html>
+<html lang={locale.lang} dir={locale.dir} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {
+      alternates.map((l) => (
+        <link rel="alternate" hreflang={l.lang} href={new URL(localizedPath(l.slug, path), site)} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(localizedPath(defaultLocale, path), site)} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#111118" />
+    <meta name="color-scheme" content="dark light" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kuchie" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={pageTitle} />
+    <meta property="og:locale" content={locale.lang.replace('-', '_')} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <script is:inline>
+      // Runs before paint: theme (shared with Starlight) and the `js` class
+      // that lets scroll animations hide content only when they can show it.
+      (() => {
+        const root = document.documentElement;
+        let stored = null;
+        try {
+          stored = localStorage.getItem('starlight-theme');
+        } catch {}
+        const theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        root.dataset.theme = theme === 'light' ? 'light' : 'dark';
+        root.classList.add('js');
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('a11y.skip')}</a>
+    <ScarfProgress />
+    <Header slug={slug} path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer slug={slug} />
+    <script>
+      import '../scripts/reveal';
+
+      // Closes header dropdowns when clicking outside or pressing Escape.
+      const menus = document.querySelectorAll<HTMLDetailsElement>('details[data-close-outside]');
+      document.addEventListener('click', (event) => {
+        menus.forEach((menu) => {
+          if (menu.open && !menu.contains(event.target as Node)) menu.open = false;
+        });
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') menus.forEach((menu) => (menu.open = false));
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 380ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    @view-transition {
+      navigation: none;
+    }
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+import Logo from '../ui/Logo.astro';
+import PixelKiri from './PixelKiri.astro';
+import { localizedPath } from '../../i18n/locales';
+import { useTranslations, type UIKey } from '../../i18n/ui';
+import { latest, links } from '../../data/site';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const t = useTranslations(slug);
+const p = (path: string) => localizedPath(slug, path);
+
+const columns: { title: UIKey; items: { label: string; href: string; external?: boolean }[] }[] = [
+  {
+    title: 'footer.product',
+    items: [
+      { label: t('nav.features'), href: p('features') },
+      { label: t('nav.download'), href: p('download') },
+      { label: t('nav.changelog'), href: p('changelog') },
+      { label: t('nav.news'), href: p('news') },
+    ],
+  },
+  {
+    title: 'footer.resources',
+    items: [
+      { label: t('nav.guides'), href: p('guides/getting-started') },
+      { label: t('nav.faq'), href: p('faq') },
+      { label: t('footer.press'), href: p('press') },
+    ],
+  },
+  {
+    title: 'footer.project',
+    items: [
+      { label: 'GitHub', href: links.github, external: true },
+      { label: t('footer.translate'), href: p('translate') },
+      { label: t('footer.contribute'), href: p('contribute') },
+      { label: t('footer.credits'), href: p('credits') },
+    ],
+  },
+  {
+    title: 'footer.legal',
+    items: [
+      { label: t('footer.privacy'), href: p('privacy') },
+      { label: t('footer.legalPage'), href: p('legal') },
+    ],
+  },
+];
+---
+
+<footer class="ftr">
+  <div class="wrap">
+    <PixelKiri />
+    <div class="ftr__grid">
+      <div>
+        <Logo href={p('')} />
+        <p class="ftr__about">{t('meta.description')}</p>
+      </div>
+      {
+        columns.map((col) => (
+          <nav aria-label={t(col.title)}>
+            <h2>{t(col.title)}</h2>
+            <ul role="list">
+              {col.items.map((item) => (
+                <li>
+                  <a href={item.href} rel={item.external ? 'noopener' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+    <div class="ftr__fine mono">
+      <span>{t('footer.disclaimer')}</span>
+      <span>v{latest.version}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    padding-block: 24px 40px;
+    border-top: 1px solid var(--line);
+    color: var(--text-2);
+    font-size: 14px;
+  }
+
+  .ftr__grid {
+    display: grid;
+    grid-template-columns: 1.6fr repeat(4, 1fr);
+    gap: 32px;
+  }
+
+  .ftr__about {
+    max-width: 22rem;
+    margin-top: 12px;
+  }
+
+  h2 {
+    margin-bottom: 12px;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  ul a {
+    transition: color var(--fast);
+  }
+
+  ul a:hover {
+    color: var(--text);
+  }
+
+  .ftr__fine {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+  }
+
+  @media (max-width: 860px) {
+    .ftr__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ftr__grid > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

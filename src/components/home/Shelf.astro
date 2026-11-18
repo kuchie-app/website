@@ -1,0 +1,115 @@
+---
+/**
+ * A shelf of covers that slides and leans as the page scrolls past it, using
+ * CSS view timelines only (no JavaScript). The covers are made-up series.
+ */
+import { Cover, SERIES } from '../art/Covers';
+
+interface Props {
+  caption: string;
+}
+
+const { caption } = Astro.props;
+const row = [...SERIES, ...SERIES, ...SERIES];
+---
+
+<section class="shelf" aria-label={caption}>
+  <div class="shelf__rail shelf__rail--a" aria-hidden="true">
+    {row.map((sr) => <div class="shelf__item"><Cover id={sr.id} title={sr.title} vol={sr.vol} /></div>)}
+  </div>
+  <div class="shelf__rail shelf__rail--b" aria-hidden="true">
+    {[...row].reverse().map((sr) => <div class="shelf__item"><Cover id={sr.id} title={sr.title} vol={sr.vol + 1} /></div>)}
+  </div>
+  <p class="wrap shelf__caption mono">{caption}</p>
+</section>
+
+<style>
+  .shelf {
+    position: relative;
+    padding-block: 24px 8px;
+    overflow: clip;
+    perspective: 1200px;
+  }
+
+  .shelf__rail {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+    padding-block: 10px;
+    transform-style: preserve-3d;
+  }
+
+  .shelf__item {
+    width: clamp(92px, 11vw, 140px);
+    flex: none;
+    transition: transform var(--mid) var(--ease);
+  }
+
+  .shelf__item:hover {
+    transform: translateY(-6px);
+  }
+
+  .shelf__caption {
+    margin-top: 16px;
+    color: var(--muted);
+  }
+
+  @supports (animation-timeline: view()) {
+    .shelf__rail {
+      animation: shelf-slide linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+
+    .shelf__rail--b {
+      animation-name: shelf-slide-back;
+    }
+
+    .shelf__item {
+      animation: shelf-lean linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+
+  @keyframes shelf-slide {
+    from {
+      transform: translateX(-4%) rotateX(18deg);
+    }
+    to {
+      transform: translateX(-34%) rotateX(-6deg);
+    }
+  }
+
+  @keyframes shelf-slide-back {
+    from {
+      transform: translateX(-36%) rotateX(18deg);
+    }
+    to {
+      transform: translateX(-6%) rotateX(-6deg);
+    }
+  }
+
+  @keyframes shelf-lean {
+    from {
+      rotate: y 24deg;
+    }
+    50% {
+      rotate: y 0deg;
+    }
+    to {
+      rotate: y -24deg;
+    }
+  }
+
+  [dir='rtl'] .shelf__rail {
+    direction: ltr;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shelf__rail,
+    .shelf__item {
+      animation: none !important;
+    }
+  }
+</style>

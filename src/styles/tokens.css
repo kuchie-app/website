@@ -1,0 +1,81 @@
+/*
+ * Kuchie design tokens (v3).
+ *
+ * The chrome is ink and paper: one tinted neutral ramp, three text roles and
+ * one accent taken from the Bookmark Scarf icon. Colour and motion live in the
+ * product scenes, not in the surfaces. Dark is the primary look.
+ */
+:root {
+  /* Ramp (dark, ink) */
+  --bg: #111118;
+  --bg-deep: #0c0c12;
+  --surface: #17171f;
+  --raised: #20202a;
+  --line: rgb(238 237 243 / 0.08);
+  --line-strong: rgb(238 237 243 / 0.14);
+  --text: #eeedf3;
+  --text-2: #aaa8b8;
+  --muted: #827f92;
+
+  /* Accent: the scarf */
+  --accent: #b5aaff;
+  --accent-ink: #9d8ff7;
+  --accent-fill: #6a58dc;
+
+  /* Primary button: off-white on dark, ink on light */
+  --btn: #eeedf3;
+  --btn-text: #111118;
+
+  /* Semantic, toned for the ramp */
+  --ok: #4cc38a;
+  --bad: #e5484d;
+
+  /* Print materials, used inside the comic scenes in both themes */
+  --paper: #f4f0ea;
+  --paper-2: #e9e3da;
+  --ink: #18142d;
+  --tone: #cbc1ff;
+
+  /* Type */
+  --font: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'PingFang SC',
+    'Hiragino Sans', 'Apple SD Gothic Neo', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Layout */
+  --max: 1200px;
+  --gutter: clamp(20px, 4vw, 32px);
+  --header: 64px;
+
+  /* Shape */
+  --r-sm: 6px;
+  --r-control: 10px;
+  --r-card: 16px;
+  --r-panel: 20px;
+
+  /* Motion: one curve */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fast: 160ms;
+  --mid: 320ms;
+  --slow: 600ms;
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f6f3ec;
+  --bg-deep: #efebe2;
+  --surface: #fdfbf6;
+  --raised: #eeeae1;
+  --line: rgb(27 26 34 / 0.08);
+  --line-strong: rgb(27 26 34 / 0.14);
+  --text: #1b1a22;
+  --text-2: #4f4b5c;
+  --muted: #6b6676;
+  --accent: #5a49c8;
+  --accent-ink: #5a49c8;
+  --btn: #1b1a22;
+  --btn-text: #f6f3ec;
+  --ok: #16a34a;
+  --bad: #dc2626;
+  color-scheme: light;
+}

@@ -1,0 +1,42 @@
+/* Maps the Kuchie ramp onto Starlight's theme variables for the docs. */
+:root {
+  --sl-font: var(--font);
+  --sl-font-mono: var(--mono);
+  --sl-color-accent-low: #26213f;
+  --sl-color-accent: #6a58dc;
+  --sl-color-accent-high: #cbc1ff;
+  --sl-color-white: #eeedf3;
+  --sl-color-gray-1: #d9d7e3;
+  --sl-color-gray-2: #aaa8b8;
+  --sl-color-gray-3: #827f92;
+  --sl-color-gray-4: #555366;
+  --sl-color-gray-5: #2c2b37;
+  --sl-color-gray-6: #17171f;
+  --sl-color-black: #111118;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e7e2fb;
+  --sl-color-accent: #5a49c8;
+  --sl-color-accent-high: #2e2470;
+  --sl-color-white: #1b1a22;
+  --sl-color-gray-1: #2c2a36;
+  --sl-color-gray-2: #4f4b5c;
+  --sl-color-gray-3: #6b6676;
+  --sl-color-gray-4: #8f8a99;
+  --sl-color-gray-5: #d9d4c9;
+  --sl-color-gray-6: #eeeae1;
+  --sl-color-gray-7: #f9f7f1;
+  --sl-color-black: #f6f3ec;
+}
+
+.header {
+  background-color: color-mix(in srgb, var(--sl-color-black) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: var(--line);
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  text-underline-offset: 0.2em;
+}

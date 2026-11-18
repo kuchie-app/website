@@ -1,0 +1,181 @@
+---
+/**
+ * FAQ: native <details> accordions (no JavaScript), opening with a height
+ * animation where the browser supports it. Also marked up as FAQPage data.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from './PageHead.astro';
+import { localizedPath } from '../../i18n/locales';
+import { pagesCopy } from '../../i18n/pages';
+import { links } from '../../data/site';
+import { useTranslations } from '../../i18n/ui';
+import fetchFailed from '../../assets/kiri/fetch-failed.png';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const c = pagesCopy(slug).faq;
+const t = useTranslations(slug);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: c.groups.flatMap((g) =>
+    g.items.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+  ),
+};
+---
+
+<BaseLayout slug={slug} path="faq" title={c.title} description={c.lede}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
+  <PageHead folio="FAQ" title={c.title} lede={c.lede} kiri={fetchFailed} />
+
+  <div class="wrap faqp">
+    {
+      c.groups.map((g, gi) => (
+        <section class="faqp__group">
+          <h2 data-reveal="title">
+            <span class="mono">0{gi + 1}</span>
+            {g.title}
+          </h2>
+          <div class="faqp__list">
+            {g.items.map(([q, a], i) => (
+              <details name={`faq-${gi}`} open={gi === 0 && i === 0} data-reveal data-reveal-delay={String(i * 60)}>
+                <summary>
+                  <span>{q}</span>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+    <p class="faqp__more">
+      {c.more}
+      <a class="link link-accent" href={localizedPath(slug, 'guides/getting-started')}>{t('nav.guides')}</a>
+      <a class="link" href={links.issues} rel="noopener">GitHub</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .faqp {
+    display: grid;
+    gap: 56px;
+    padding-bottom: 96px;
+  }
+
+  .faqp__group {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 40px;
+  }
+
+  .faqp__group h2 {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+
+  .faqp__group h2 .mono {
+    color: var(--muted);
+  }
+
+  details {
+    border-top: 1px solid var(--line);
+    interpolate-size: allow-keywords;
+  }
+
+  details:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 350ms var(--ease),
+      content-visibility 350ms allow-discrete;
+  }
+
+  details[open]::details-content {
+    block-size: auto;
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    font-weight: 500;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary svg {
+    flex: none;
+    color: var(--muted);
+    transition: transform 250ms var(--ease);
+  }
+
+  details[open] summary svg {
+    transform: rotate(45deg);
+  }
+
+  details[open] p {
+    animation: answer-in 420ms var(--ease) both;
+  }
+
+  @keyframes answer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  summary {
+    transition: color var(--fast);
+  }
+
+  details:hover summary,
+  details[open] summary {
+    color: var(--text);
+  }
+
+  details[open] {
+    border-top-color: var(--accent);
+  }
+
+  details p {
+    max-width: 40rem;
+    padding-bottom: 20px;
+    color: var(--text-2);
+  }
+
+  .faqp__more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    color: var(--text-2);
+  }
+
+  @media (max-width: 719px) {
+    .faqp__group {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+</style>

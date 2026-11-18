@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RibbonArt from '../components/art/RibbonArt.astro';
+import { useTranslations } from '../i18n/ui';
+
+// One static 404 for the whole site (Cloudflare Pages serves /404.html).
+const t = useTranslations('en');
+---
+
+<BaseLayout slug="en" path="404" title={t('notfound.title')} noindex>
+  <section class="nf">
+    <div class="wrap nf__inner">
+      <RibbonArt scene="lost" class="nf__art" />
+      <p class="mono nf__code">404</p>
+      <h1>{t('notfound.title')}</h1>
+      <p class="nf__body">{t('notfound.body')}</p>
+      <a class="btn btn-primary" href="/">{t('home.back')}</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    padding-block: clamp(80px, 12vw, 160px);
+    text-align: center;
+  }
+
+  .nf__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    max-width: 36rem;
+  }
+
+  .nf :global(.nf__art) {
+    width: min(300px, 70vw);
+    height: auto;
+  }
+
+  .nf__code {
+    color: var(--muted);
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .nf__body {
+    margin-bottom: 0.75rem;
+    color: var(--text-2);
+  }
+
+
+</style>

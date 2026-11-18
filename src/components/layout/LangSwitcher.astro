@@ -1,0 +1,94 @@
+---
+import Icon from '../ui/Icon.astro';
+import { locales, localizedPath } from '../../i18n/locales';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  slug: string;
+  path: string;
+}
+
+const { slug, path } = Astro.props;
+const t = useTranslations(slug);
+---
+
+<details class="lang" data-close-outside>
+  <summary class="icon-btn" aria-label={t('nav.language')}>
+    <Icon name="globe" size={18} />
+  </summary>
+  <ul class="lang__list" role="list">
+    {
+      locales.map((l) => (
+        <li>
+          <a
+            href={localizedPath(l.slug, path)}
+            lang={l.lang}
+            dir={l.dir}
+            hreflang={l.lang}
+            aria-current={l.slug === slug ? 'true' : undefined}
+          >
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</details>
+
+<style>
+  .lang {
+    position: relative;
+  }
+
+  .lang__list {
+    position: absolute;
+    inset-inline-end: 0;
+    top: calc(100% + 12px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(152px, 1fr));
+    gap: 2px;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    max-height: min(70vh, 520px);
+    margin: 0;
+    padding: 8px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background: var(--surface);
+    box-shadow: 0 16px 40px -16px rgb(0 0 0 / 0.5);
+    animation: lang-pop 200ms var(--ease);
+  }
+
+  .lang__list a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .lang__list a:hover {
+    background: var(--raised);
+  }
+
+  .lang__list a[aria-current] {
+    color: var(--accent);
+  }
+
+  @keyframes lang-pop {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .lang__list {
+      position: fixed;
+      inset-inline: 16px;
+      top: 72px;
+      width: auto;
+    }
+  }
+</style>

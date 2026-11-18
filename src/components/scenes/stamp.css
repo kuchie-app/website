@@ -1,0 +1,147 @@
+.stamp {
+  padding-block: clamp(96px, 12vw, 160px);
+}
+
+.stamp__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 64px;
+}
+
+.stamp__link {
+  margin-top: 24px;
+}
+
+.desk {
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.desk__surface {
+  position: relative;
+  height: 340px;
+  display: grid;
+  place-items: center;
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.slip {
+  position: absolute;
+  display: grid;
+  gap: 6px;
+  width: min(320px, 78%);
+  padding: 20px 22px 22px;
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.05),
+    0 18px 30px -18px rgb(0 0 0 / 0.55);
+}
+
+.slip__hole {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+.slip__label {
+  color: #8a8797;
+  font-size: 10px;
+}
+
+.slip__name {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: ltr;
+  text-align: start;
+}
+
+.slip__check {
+  color: #4f4b5c;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/* Ink seal */
+.seal {
+  position: absolute;
+  inset-inline-end: 14px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border: 2.5px solid currentColor;
+  border-radius: 8px;
+  font: 600 13px/1 var(--font);
+  letter-spacing: 0.02em;
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+}
+
+.seal::after {
+  content: '';
+  position: absolute;
+  inset: -2.5px;
+  border-radius: inherit;
+  background-image: radial-gradient(rgb(244 240 234 / 0.55) 0.8px, transparent 1.2px);
+  background-size: 4px 4px;
+}
+
+.seal--ok {
+  color: #5a49c8;
+}
+
+.seal--no {
+  color: #c43a3e;
+}
+
+.desk__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.desk__replay {
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  cursor: pointer;
+  transition:
+    color var(--fast),
+    opacity var(--fast);
+}
+
+.desk__replay:hover {
+  color: var(--text);
+}
+
+.desk__replay:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (max-width: 719px) {
+  .stamp__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .desk__surface {
+    height: 300px;
+  }
+}

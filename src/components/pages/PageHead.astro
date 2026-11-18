@@ -1,0 +1,81 @@
+---
+/** Shared page header: folio, title, lede and an optional Kiri pose. */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  folio: string;
+  title: string;
+  lede: string;
+  kiri?: ImageMetadata;
+}
+
+const { folio, title, lede, kiri } = Astro.props;
+---
+
+<header class="phead">
+  <div class="wrap phead__inner">
+    <div>
+      <p class="folio mono"><b>{folio}</b></p>
+      <h1 class="phead__title" data-reveal="title">{title}</h1>
+      <p class="lead-text phead__lede" data-reveal data-reveal-delay="120">{lede}</p>
+      <slot />
+    </div>
+    {kiri && <Image src={kiri} alt="" width={240} class="phead__kiri" loading="eager" />}
+  </div>
+</header>
+
+<style>
+  .phead {
+    padding-block: clamp(48px, 8vw, 96px) clamp(32px, 5vw, 56px);
+  }
+
+  .phead__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 32px;
+  }
+
+  .phead__title {
+    font-size: clamp(36px, 5vw, 60px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  :lang(ar) .phead__title {
+    line-height: 1.35;
+  }
+
+  .phead__lede {
+    font-size: 19px;
+    line-height: 30px;
+  }
+
+  .phead :global(.phead__kiri) {
+    width: clamp(120px, 16vw, 220px);
+    height: auto;
+    animation: phead-in 900ms var(--ease) 200ms both;
+  }
+
+  [dir='rtl'] .phead :global(.phead__kiri) {
+    scale: -1 1;
+  }
+
+  @keyframes phead-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px) rotate(-6deg);
+    }
+  }
+
+  @media (max-width: 719px) {
+    .phead__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .phead :global(.phead__kiri) {
+      display: none;
+    }
+  }
+</style>

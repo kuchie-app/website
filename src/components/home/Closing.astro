@@ -1,0 +1,487 @@
+---
+/**
+ * Open source, the questions, and the back cover. The back cover turns in
+ * on a CSS view timeline, and its barcode is generated from the version.
+ */
+import FaqList from '../scenes/FaqList';
+import type { HomeCopy } from '../../i18n/home';
+import RibbonArt from '../art/RibbonArt.astro';
+import { Image } from 'astro:assets';
+import kiriSitting from '../../assets/kiri/kiri-loading.png';
+import { localizedPath } from '../../i18n/locales';
+import { altstoreUrl, latest, links } from '../../data/site';
+
+interface Props {
+  c: HomeCopy;
+  slug: string;
+  download: string;
+  altstore: string;
+  meta: string[];
+}
+
+const { c, slug, download, altstore, meta } = Astro.props;
+
+// A barcode from the version string: stable, looks printed, says nothing false.
+const code = `${c.back.barcode}-${latest.version}`;
+const bars: { x: number; w: number }[] = [];
+let x = 0;
+for (const ch of code) {
+  const n = ch.charCodeAt(0);
+  for (let b = 0; b < 4; b++) {
+    const w = 1 + ((n >> b) & 1) * 2 + ((n >> (b + 3)) & 1);
+    if (b % 2 === 0) bars.push({ x, w });
+    x += w + 1;
+  }
+}
+---
+
+<section class="oss" aria-labelledby="oss-title">
+  <div class="wrap oss__grid" data-reveal>
+    <div>
+      <p class="folio mono"><b>06</b><span>{c.oss.folio}</span></p>
+      <h2 id="oss-title" class="h2" data-reveal="title" data-reveal-delay="60">{c.oss.title}</h2>
+      <p class="lead-text">{c.oss.lede}</p>
+      <p class="oss__link">
+        <a class="link" href={links.github} rel="noopener">
+          kuchie-app/Kuchie
+          <svg class="arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </a>
+      </p>
+    </div>
+    <dl class="oss__stats">
+      <div><dt>{c.oss.stores}</dt><dd data-count="80">80</dd></div>
+      <div><dt>{c.oss.extensions}</dt><dd data-count="211">211</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="faq" aria-labelledby="faq-title">
+  <div class="wrap faq__grid">
+    <div data-reveal>
+      <p class="folio mono"><b>07</b><span>{c.faq.folio}</span></p>
+      <h2 id="faq-title" class="h2" data-reveal="title" data-reveal-delay="60">{c.faq.title}</h2>
+      <p class="faq__all">
+        <a class="link link-accent" href={localizedPath(slug, 'faq')}>
+          {c.faq.all}
+          <svg class="arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </a>
+      </p>
+    </div>
+    <div data-reveal data-reveal-delay="80">
+      <FaqList client:visible items={c.faq.items} />
+    </div>
+  </div>
+</section>
+
+<section class="back" aria-labelledby="back-title">
+  <div class="wrap back__wrap">
+    <div class="back__book" data-reveal>
+      <Image src={kiriSitting} alt="" width={220} class="back__sitter" loading="lazy" />
+      <span class="back__sheet back__sheet--1" aria-hidden="true"></span>
+      <span class="back__sheet back__sheet--2" aria-hidden="true"></span>
+      <span class="back__sheet back__sheet--3" aria-hidden="true"></span>
+      <svg class="back__ribbon" viewBox="0 0 16 96" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0h16v96l-8-9-8 9z"></path></svg>
+      <div class="back__cover">
+        <RibbonArt scene="night" class="back__art" />
+        <div class="back__text">
+          <h2 id="back-title">{c.back.title}</h2>
+          <p>{c.back.body}</p>
+          <div class="back__actions">
+            <a class="btn btn-primary" href={localizedPath(slug, 'download')}>{download}</a>
+            <a class="link" href={altstoreUrl}>
+              {altstore}
+              <svg class="arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            </a>
+          </div>
+        </div>
+        <div class="back__barcode" aria-hidden="true">
+          <svg viewBox={`0 0 ${x} 40`} preserveAspectRatio="none">
+            {bars.map((b, i) => <rect x={b.x} y="0" width={b.w} height="40" style={`--d:${i * 18}ms`} />)}
+          </svg>
+          <span class="mono">{meta.join(' · ')}</span>
+        </div>
+      </div>
+      <div class="back__pages" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .oss,
+  .faq {
+    padding-block: clamp(80px, 10vw, 128px) 0;
+  }
+
+  .oss__grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 48px;
+    padding: 40px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-panel);
+    background: var(--surface);
+  }
+
+  .oss__link {
+    margin-top: 24px;
+  }
+
+  .oss__stats {
+    display: flex;
+    gap: 48px;
+    margin: 0;
+  }
+
+  .oss__stats div {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .oss__stats dd {
+    margin: 0;
+    font-size: 40px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .oss__stats dt {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .faq__grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 64px;
+  }
+
+  .faq__all {
+    margin-top: 24px;
+  }
+
+  .faq :global(.faq-item) {
+    border-top: 1px solid var(--line);
+  }
+
+  .faq :global(.faq-item:last-child) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq :global(.faq-item h3) {
+    font-size: 16px;
+  }
+
+  .faq :global(.faq-item button) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 20px 0;
+    border: 0;
+    background: none;
+    font: 500 16px/1.4 var(--font);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .faq :global(.faq-item button svg) {
+    flex: none;
+    color: var(--muted);
+  }
+
+  .faq :global(.faq-item p) {
+    max-width: 36rem;
+    padding-bottom: 20px;
+    color: var(--text-2);
+  }
+
+  /* Back cover */
+  .back {
+    padding-block: clamp(96px, 12vw, 160px) clamp(64px, 8vw, 112px);
+    perspective: 1600px;
+  }
+
+  .back__book {
+    position: relative;
+    max-width: 960px;
+    margin-inline: auto;
+    transform-style: preserve-3d;
+  }
+
+  @supports (animation-timeline: view()) {
+    .back__book {
+      animation: back-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+
+  @keyframes back-in {
+    from {
+      transform: rotateX(18deg) rotateY(-22deg) translateY(60px);
+      opacity: 0.3;
+    }
+  }
+
+  .back__cover {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 40px;
+    min-height: 360px;
+    padding: 48px;
+    border-radius: 8px 3px 3px 8px;
+    background: #18142d;
+    color: #eeedf3;
+    overflow: hidden;
+    box-shadow: inset -14px 0 0 rgb(0 0 0 / 0.18), 0 40px 80px -40px rgb(0 0 0 / 0.7);
+  }
+
+  :root[data-theme='light'] .back__cover {
+    box-shadow: inset -14px 0 0 rgb(0 0 0 / 0.18), 0 30px 60px -30px rgb(27 26 34 / 0.4);
+  }
+
+  /* Kiri hops up and sits on the top edge of the book. */
+  .back__book :global(.back__sitter) {
+    position: absolute;
+    z-index: 3;
+    top: calc(clamp(110px, 12vw, 160px) * -0.78);
+    inset-inline-end: 12%;
+    width: clamp(110px, 12vw, 160px);
+    height: auto;
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+    transition:
+      opacity 400ms var(--ease) 300ms,
+      transform 700ms cubic-bezier(0.34, 1.5, 0.64, 1) 300ms;
+  }
+
+  .back__book:global(.is-revealed) :global(.back__sitter) {
+    opacity: 1;
+    transform: none;
+  }
+
+  [dir='rtl'] .back__book :global(.back__sitter) {
+    scale: -1 1;
+  }
+
+  /* Pages drift out of the book once. */
+  .back__sheet {
+    position: absolute;
+    z-index: 2;
+    top: 18%;
+    inset-inline-end: 30%;
+    width: 46px;
+    height: 60px;
+    border-radius: 3px;
+    background: var(--paper);
+    box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .back__book:global(.is-revealed) .back__sheet--1 {
+    animation: sheet-a 2.6s var(--ease) 0.5s both;
+  }
+
+  .back__book:global(.is-revealed) .back__sheet--2 {
+    animation: sheet-b 2.8s var(--ease) 0.7s both;
+  }
+
+  .back__book:global(.is-revealed) .back__sheet--3 {
+    animation: sheet-c 3s var(--ease) 0.9s both;
+  }
+
+  @keyframes sheet-a {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-140px, -180px) rotate(-40deg);
+    }
+  }
+
+  @keyframes sheet-b {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(60px, -220px) rotate(30deg);
+    }
+  }
+
+  @keyframes sheet-c {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-30px, -260px) rotate(-12deg);
+    }
+  }
+
+  /* The bookmark ribbon hangs out of the bottom and sways. */
+  .back__ribbon {
+    position: absolute;
+    z-index: 0;
+    bottom: -64px;
+    inset-inline-start: 22%;
+    width: 16px;
+    height: 90px;
+    fill: #b5aaff;
+    transform-origin: 50% 0;
+    animation: ribbon-sway 3.6s ease-in-out infinite;
+  }
+
+  @keyframes ribbon-sway {
+    0%,
+    100% {
+      transform: rotate(4deg);
+    }
+    50% {
+      transform: rotate(-5deg);
+    }
+  }
+
+  /* Barcode bars print in. */
+  .back__barcode rect {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transform: scaleY(0);
+    transition: transform 400ms var(--ease);
+    transition-delay: calc(600ms + var(--d));
+  }
+
+  .back__book:global(.is-revealed) .back__barcode rect {
+    transform: scaleY(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back__sheet,
+    .back__ribbon {
+      animation: none !important;
+    }
+
+    .back__book :global(.back__sitter),
+    .back__barcode rect {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .back__pages {
+    position: absolute;
+    inset: 6px -10px 6px auto;
+    width: 12px;
+    z-index: -1;
+    border-radius: 0 4px 4px 0;
+    background: repeating-linear-gradient(90deg, #ece6dc 0 1px, #d6cfc3 1px 2px);
+  }
+
+  .back__cover :global(.back__art) {
+    width: clamp(180px, 22vw, 260px);
+  }
+
+  .back__cover :global(.ribbon-art__float) {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    transition: transform 1.2s var(--ease);
+  }
+
+  .back__cover:hover :global(.ribbon-art__float) {
+    transform: translate(30px, 30px) scale(1.3) rotate(-6deg);
+  }
+
+  .back__text h2 {
+    font-size: clamp(30px, 3.4vw, 44px);
+    letter-spacing: -0.025em;
+  }
+
+  .back__text p {
+    margin-top: 8px;
+    color: #b9b4d6;
+    font-size: 17px;
+  }
+
+  .back__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+    margin-top: 28px;
+  }
+
+  .back__actions .btn-primary {
+    background: #eeedf3;
+    color: #111118;
+  }
+
+  .back__actions .link {
+    color: #eeedf3;
+  }
+
+  .back__barcode {
+    position: absolute;
+    inset-inline-end: 28px;
+    bottom: 24px;
+    display: grid;
+    gap: 6px;
+    width: 170px;
+    padding: 10px 10px 8px;
+    border-radius: 4px;
+    background: #f4f0ea;
+    color: #18142d;
+  }
+
+  .back__barcode svg {
+    width: 100%;
+    height: 40px;
+    fill: #18142d;
+  }
+
+  .back__barcode .mono {
+    font-size: 9px;
+    line-height: 12px;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .oss__grid,
+    .faq__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .oss__grid {
+      padding: 28px;
+    }
+
+    .back__cover {
+      grid-template-columns: 1fr;
+      padding: 32px 28px 120px;
+      gap: 16px;
+    }
+
+    .back__cover :global(.back__art) {
+      width: 180px;
+    }
+  }
+</style>

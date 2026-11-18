@@ -1,0 +1,12 @@
+---
+import PageRouter from '../components/pages/PageRouter.astro';
+import { pages, type PageSlug } from '../data/site';
+
+export function getStaticPaths() {
+  return pages.map((page) => ({ params: { page } }));
+}
+
+const page = Astro.params.page as PageSlug;
+---
+
+<PageRouter slug="en" page={page} />

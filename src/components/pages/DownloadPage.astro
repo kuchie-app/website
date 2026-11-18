@@ -1,0 +1,366 @@
+---
+/**
+ * Download: the latest release (always from GitHub at build time), the
+ * checksum with a copy button, the AltStore/SideStore source, install methods
+ * and earlier releases.
+ */
+import { marked } from 'marked';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from './PageHead.astro';
+import { getLocale, localizedPath } from '../../i18n/locales';
+import { pagesCopy } from '../../i18n/pages';
+import { altstoreUrl, latest, links, releases } from '../../data/site';
+import complete from '../../assets/kiri/complete.png';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const locale = getLocale(slug);
+const c = pagesCopy(slug).download;
+const date = (iso: string) => new Intl.DateTimeFormat(locale.lang, { dateStyle: 'long' }).format(new Date(iso));
+const mb = (bytes: number) => `${Math.round(bytes / 1_000_000)} MB`;
+const sidestoreUrl = `sidestore://source?url=${encodeURIComponent(links.altstoreSource)}`;
+const notes = await marked.parse(latest.notes || '');
+---
+
+<BaseLayout slug={slug} path="download" title={c.title} description={c.lede}>
+  <PageHead folio={`v${latest.version}`} title={c.title} lede={c.lede} kiri={complete} />
+
+  <div class="wrap dl">
+    <section class="release" data-reveal>
+      <div class="release__top">
+        <div>
+          <p class="mono release__label">{c.latest}</p>
+          <p class="release__version">Kuchie {latest.version}</p>
+        </div>
+        <a class="btn btn-primary release__btn" href={latest.ipa.url}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19h14"></path></svg>
+          {c.downloadIpa}
+        </a>
+      </div>
+
+      <dl class="release__facts">
+        <div><dt>{c.released}</dt><dd>{date(latest.date)}</dd></div>
+        <div><dt>{c.size}</dt><dd>{mb(latest.ipa.size)}</dd></div>
+        <div><dt>{c.requires}</dt><dd>{c.requiresValue}</dd></div>
+      </dl>
+
+      {
+        latest.sha256 && (
+          <div class="sha">
+            <span class="mono sha__label">{c.sha}</span>
+            <code class="sha__value" dir="ltr">{latest.sha256}</code>
+            <button class="btn btn-secondary btn-sm" type="button" data-copy={latest.sha256} data-copied={c.copied}>
+              {c.copy}
+            </button>
+          </div>
+        )
+      }
+
+      <div class="release__stores">
+        <a class="btn btn-secondary" href={altstoreUrl}>{c.altstore}</a>
+        <a class="btn btn-secondary" href={sidestoreUrl}>{c.sidestore}</a>
+        <span class="mono release__source">
+          {c.source}: <span dir="ltr">{links.altstoreSource}</span>
+        </span>
+      </div>
+    </section>
+
+    <section class="methods">
+      <h2 class="h2" data-reveal="title">{c.methodsTitle}</h2>
+      <ol class="methods__list" role="list">
+        {
+          c.methods.map(([name, body, guide], i) => (
+            <li data-reveal data-reveal-delay={String(i * 80)}>
+              <a href={localizedPath(slug, `guides/${guide}`)}>
+                <span class="mono">0{i + 1}</span>
+                <h3>{name}</h3>
+                <p>{body}</p>
+                <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="methods__help">
+        <a class="link link-accent" href={localizedPath(slug, 'guides/install')}>{c.help}</a>
+      </p>
+    </section>
+
+    <section class="verify" data-reveal>
+      <h2 class="h2">{c.verifyTitle}</h2>
+      <p class="lead-text">{c.verifyBody}</p>
+      <pre dir="ltr"><code>shasum -a 256 {latest.ipa.name}</code></pre>
+      <pre dir="ltr"><code>Get-FileHash .\{latest.ipa.name} -Algorithm SHA256</code></pre>
+    </section>
+
+    <section class="notes" data-reveal>
+      <h2 class="h2">{c.notes}</h2>
+      <div class="prose" set:html={notes} />
+    </section>
+
+    {
+      releases.length > 1 && (
+        <section class="older">
+          <h2 class="h2">{c.older}</h2>
+          <ul role="list">
+            {releases.slice(1).map((r) => (
+              <li>
+                <a href={r.url} rel="noopener">
+                  <span>Kuchie {r.version}</span>
+                  <span class="mono">{date(r.date)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+    <p class="all">
+      <a class="link" href={`${links.github}/releases`} rel="noopener">{c.allReleases}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+    const label = button.textContent;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? '');
+        button.textContent = button.dataset.copied ?? 'Copied';
+        setTimeout(() => (button.textContent = label), 1600);
+      } catch {
+        /* clipboard may be unavailable */
+      }
+    });
+  });
+</script>
+
+<style>
+  .dl {
+    display: grid;
+    gap: 80px;
+    padding-bottom: 96px;
+  }
+
+  .release {
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-panel);
+    background: var(--surface);
+  }
+
+  .release__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .release__label {
+    color: var(--muted);
+  }
+
+  .release__version {
+    margin-top: 4px;
+    font-size: clamp(28px, 3vw, 36px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .release__btn {
+    height: 48px;
+    padding-inline: 24px;
+  }
+
+  .release__facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 32px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .release__facts dt {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .release__facts dd {
+    margin: 4px 0 0;
+    font-size: 16px;
+  }
+
+  .sha {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 12px 12px 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+    background: var(--bg-deep);
+  }
+
+  .sha__label {
+    color: var(--muted);
+  }
+
+  .sha__value {
+    overflow: hidden;
+    color: var(--text-2);
+    font: 400 13px/1.4 var(--mono);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .release__stores {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .release__source {
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  .methods__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 32px 0 0;
+    padding: 0;
+  }
+
+  .methods__list a {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    height: 100%;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background: var(--surface);
+    transition:
+      border-color var(--mid) var(--ease),
+      transform var(--mid) var(--ease);
+  }
+
+  .methods__list a:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-2px);
+  }
+
+  .methods__list .mono {
+    color: var(--muted);
+  }
+
+  .methods__list h3 {
+    font-size: 18px;
+  }
+
+  .methods__list p {
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .methods__list .arrow {
+    margin-top: 8px;
+    color: var(--muted);
+  }
+
+  .methods__list a:hover .arrow {
+    color: var(--text);
+    transform: translateX(3px);
+  }
+
+  .methods__help {
+    margin-top: 20px;
+  }
+
+  pre {
+    margin: 16px 0 0;
+    padding: 14px 16px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+    background: var(--bg-deep);
+    font: 400 13px/1.5 var(--mono);
+  }
+
+  .prose {
+    max-width: 44rem;
+    margin-top: 16px;
+    color: var(--text-2);
+  }
+
+  .prose :global(h3) {
+    margin: 28px 0 8px;
+    color: var(--text);
+    font-size: 17px;
+  }
+
+  .prose :global(ul) {
+    padding-inline-start: 20px;
+  }
+
+  .prose :global(li) {
+    margin: 6px 0;
+  }
+
+  .prose :global(code) {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--raised);
+    font: 400 0.88em var(--mono);
+  }
+
+  .prose :global(strong) {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .older ul {
+    list-style: none;
+    display: grid;
+    margin: 20px 0 0;
+    padding: 0;
+  }
+
+  .older a {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .older .mono {
+    color: var(--muted);
+  }
+
+  @media (max-width: 719px) {
+    .release__facts,
+    .methods__list {
+      grid-template-columns: 1fr;
+    }
+
+    .sha {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .sha__label {
+      display: none;
+    }
+  }
+</style>
