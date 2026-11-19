@@ -22,5 +22,5 @@ Kuchie isn't on the App Store yet, so you install the IPA file yourself and sign
 - **Download the IPA** named `Kuchie-vX.Y.Z-unsigned.ipa` and the `.sha256` file next to it.
 
 :::caution
-Only install Kuchie from kuchie.app or github.com/kuchie-app. Copies from other places may be modified.
+Only install Kuchie from this website or github.com/kuchie-app. Copies from other places may be modified.
 :::

@@ -5,7 +5,7 @@ export const links = {
   website: 'https://github.com/kuchie-app/website',
   issues: 'https://github.com/kuchie-app/Kuchie/issues',
   security: 'https://github.com/kuchie-app/Kuchie/security/advisories/new',
-  altstoreSource: 'https://kuchie.app/altstore.json',
+  altstoreSource: new URL('/altstore.json', import.meta.env.SITE).href,
 };
 
 export const altstoreUrl = `altstore://source?url=${encodeURIComponent(links.altstoreSource)}`;

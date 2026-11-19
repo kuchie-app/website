@@ -17,11 +17,7 @@ Langkah tepatnya berubah antar versi SideStore, jadi ikuti panduan mereka, bukan
 
 **Lewat source**
 
-Di SideStore, buka **Sources**, ketuk **+**, lalu tambahkan:
-
-```
-https://kuchie.app/altstore.json
-```
+Di iPhone, buka halaman [Unduh](/id/download/) lalu ketuk **Tambah ke SideStore**. Atau salin link source yang tertera di sana, lalu di SideStore buka **Sources**, ketuk **+**, dan tempel.
 
 Buka Kuchie di source itu dan ketuk **Get**.
 

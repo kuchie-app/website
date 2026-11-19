@@ -39,7 +39,7 @@ const ogImage = new URL(slug === 'id' ? '/og/id.png' : '/og/default.png', site);
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {(noindex || site.hostname !== 'kuchie.app') && <meta name="robots" content="noindex" />}
     {
       alternates.map((l) => (
         <link rel="alternate" hreflang={l.lang} href={new URL(localizedPath(l.slug, path), site)} />

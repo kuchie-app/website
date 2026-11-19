@@ -5,7 +5,7 @@
 import type { APIRoute } from 'astro';
 import { releases } from '../data/site';
 
-const SITE = 'https://kuchie.app';
+const SITE = (import.meta.env.SITE ?? 'https://kuchie.app').replace(/\/+$/, '');
 
 export const GET: APIRoute = () => {
   const source = {

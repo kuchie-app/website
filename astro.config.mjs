@@ -6,8 +6,14 @@ import sitemap from '@astrojs/sitemap';
 import { indexedLocales, localeSlugs, starlightLocales } from './src/i18n/locales.ts';
 import { sidebar } from './src/i18n/sidebar.ts';
 
+// The public address. kuchie.app by default; CI sets SITE_URL (for example a
+// pages.dev address) until the domain is connected.
+const SITE = (process.env.SITE_URL || 'https://kuchie.app').replace(/\/+$/, '');
+// Only the real domain is indexed; temporary addresses get noindex.
+const INDEXABLE = new URL(SITE).hostname === 'kuchie.app';
+
 export default defineConfig({
-  site: 'https://kuchie.app',
+  site: SITE,
   trailingSlash: 'always',
   build: { format: 'directory' },
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
@@ -43,11 +49,12 @@ export default defineConfig({
       head: [
         { tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
         { tag: 'meta', attrs: { name: 'theme-color', content: '#111118' } },
-        { tag: 'meta', attrs: { property: 'og:image', content: 'https://kuchie.app/og/default.png' } },
+        { tag: 'meta', attrs: { property: 'og:image', content: `${SITE}/og/default.png` } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://kuchie.app/og/default.png' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: `${SITE}/og/default.png` } },
+        ...(INDEXABLE ? [] : [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' } }]),
       ],
     }),
   ],

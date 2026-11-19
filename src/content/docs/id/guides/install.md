@@ -22,5 +22,5 @@ Kuchie belum ada di App Store, jadi kamu memasang file IPA sendiri dan menandata
 - **Unduh IPA** bernama `Kuchie-vX.Y.Z-unsigned.ipa` dan file `.sha256` di sampingnya.
 
 :::caution
-Pasang Kuchie hanya dari kuchie.app atau github.com/kuchie-app. Salinan dari tempat lain bisa saja sudah diubah.
+Pasang Kuchie hanya dari website ini atau github.com/kuchie-app. Salinan dari tempat lain bisa saja sudah diubah.
 :::

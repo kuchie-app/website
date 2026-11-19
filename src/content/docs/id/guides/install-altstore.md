@@ -21,7 +21,7 @@ Kamu bisa menambahkan source Kuchie supaya update muncul di AltStore, atau memas
 
 **Lewat source (disarankan)**
 
-1. Di iPhone, buka halaman [Unduh](/id/download/) dan ketuk **Tambah ke AltStore**, atau tambahkan `https://kuchie.app/altstore.json` di AltStore lewat **Browse → Sources → +**.
+1. Di iPhone, buka halaman [Unduh](/id/download/) dan ketuk **Tambah ke AltStore**, atau salin link source yang tertera di halaman itu lalu tambahkan di AltStore lewat **Browse → Sources → +**.
 2. Cari Kuchie di source itu dan ketuk **Get**.
 
 **Lewat file IPA**

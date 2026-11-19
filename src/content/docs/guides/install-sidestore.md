@@ -17,11 +17,7 @@ The exact steps change between SideStore versions, so use their guide rather tha
 
 **With the source**
 
-In SideStore, open **Sources**, tap **+** and add:
-
-```
-https://kuchie.app/altstore.json
-```
+On the iPhone, open the [Download](/download/) page and tap **Add to SideStore**. Or copy the source link shown there, then in SideStore open **Sources**, tap **+** and paste it.
 
 Then open Kuchie in the source and tap **Get**.
 
