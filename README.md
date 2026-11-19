@@ -38,6 +38,7 @@ npm run check:i18n     # translation coverage report
 | `src/data/releases.json` | Releases cached by `scripts/fetch-release.mjs` |
 | `src/pages/altstore.json.ts` | The AltStore / SideStore source, generated from releases |
 | `scripts/make-og.mjs` | Renders the link-preview images in `public/og/` |
+| `wrangler.jsonc` | Cloudflare deploy settings |
 
 ## Languages
 
@@ -54,20 +55,32 @@ Every build reads the app's GitHub releases (`vX.Y.Z` tags only). The download p
 - when the app repository sends a `kuchie-release` dispatch (see below),
 - by hand from the Actions tab.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare)
 
-One-time setup:
+The site is served by Cloudflare Workers static assets (the successor to Cloudflare Pages), configured in `wrangler.jsonc`. It's live at **https://kuchie.kuchie-website.workers.dev** until the domain is connected.
 
-1. **Domain.** Register `kuchie.app` (Cloudflare Registrar sells it at cost) or add it to Cloudflare if registered elsewhere.
-2. **Pages project.** In Cloudflare → Workers & Pages → Create → Pages → *Upload assets*, create a project named `kuchie` (the upload itself can be skipped).
-3. **Custom domain.** In the project → Custom domains, add `kuchie.app` (and optionally `www.kuchie.app`).
-4. **API token.** Cloudflare → My Profile → API Tokens → Create token with the *Cloudflare Pages: Edit* permission for your account.
-5. **Secrets.** In this repository → Settings → Secrets and variables → Actions, add:
-   - `CLOUDFLARE_API_TOKEN`: the token from step 4
-   - `CLOUDFLARE_ACCOUNT_ID`: your account ID (Cloudflare dashboard, right sidebar)
-6. Run the **Deploy** workflow from the Actions tab, or push to `main`.
+Deploy by hand from a machine logged in with `npx wrangler login`:
 
-Until the secrets exist, the workflow still builds and checks the site but skips the deploy step.
+```sh
+SITE_URL=https://kuchie.kuchie-website.workers.dev npm run build
+npx wrangler deploy
+```
+
+### Automatic deploys from GitHub Actions
+
+The repository already has the `SITE_URL` variable and the `CLOUDFLARE_ACCOUNT_ID` secret. One more secret is needed:
+
+1. Cloudflare → My Profile → API Tokens → **Create Token** → *Edit Cloudflare Workers* template (or a custom token with *Account → Workers Scripts → Edit*), limited to your account.
+2. Repository → Settings → Secrets and variables → Actions → **New repository secret**: `CLOUDFLARE_API_TOKEN`.
+3. Run the **Deploy** workflow from the Actions tab.
+
+Until that secret exists, the workflow still builds and checks the site but skips the deploy step.
+
+### Connecting kuchie.app later
+
+1. Register `kuchie.app` (Cloudflare Registrar sells it at cost) or add it to Cloudflare.
+2. Add `"routes": [{ "pattern": "kuchie.app", "custom_domain": true }]` to `wrangler.jsonc`, or add the domain under the Worker's *Domains & Routes* in the dashboard.
+3. Change the `SITE_URL` variable to `https://kuchie.app` and run **Deploy**. Indexing and the sitemap switch on automatically for kuchie.app.
 
 ### Rebuild when the app ships a release
 

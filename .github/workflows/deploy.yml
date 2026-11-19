@@ -1,4 +1,5 @@
-# Builds the site and deploys it to Cloudflare Pages.
+# Builds the site and deploys it to Cloudflare (Workers static assets, the
+# successor to Pages; see wrangler.jsonc).
 #
 # Runs on every push to main, every 6 hours, when the app repository publishes a
 # release (repository_dispatch "kuchie-release"), and by hand. Each build reads
@@ -47,10 +48,10 @@ jobs:
 
       - run: npm run check:budget
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=kuchie --branch=main
+          command: deploy
